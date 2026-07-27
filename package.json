@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "Furigana Conversion Server",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "start": "node src/app.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -10,7 +11,9 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "express": "^5.2.1"
+    "express": "^5.2.1",
+    "kuroshiro": "^1.2.0",
+    "kuroshiro-analyzer-kuromoji": "^1.1.0"
   },
   "devDependencies": {
     "@types/express": "^5.0.6",
