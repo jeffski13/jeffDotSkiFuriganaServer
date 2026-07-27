@@ -24,7 +24,7 @@ export const convertToFurigana = async (text: string): Promise<string> => {
   return kuroshiro.convert(text, {
     mode: 'okurigana',
     to: 'hiragana',
-    delimiter_start: '(',
-    delimiter_end: ')',
+    delimiter_start: '（',
+    delimiter_end: '）',
   });
 };
