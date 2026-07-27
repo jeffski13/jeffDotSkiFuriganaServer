@@ -1,9 +1,16 @@
-import express, { type Express, type Request, type Response } from 'express';
+import express, { type Express, type NextFunction, type Request, type Response } from 'express';
 import { convertToFurigana } from './furigana.ts';
 
 export const app: Express = express();
 
 app.use(express.json());
+
+app.use((req: Request, _res: Response, next: NextFunction) => {
+  const timestamp = new Date().toISOString().slice(0, 16);
+  const lineCount = Array.isArray(req.body) ? req.body.length : 0;
+  console.log(`[${timestamp}] ${req.method} ${req.originalUrl} - ${lineCount} line(s)`);
+  next();
+});
 
 app.get('/', (req: Request, res: Response) => {
   res.send('Hello World!');
