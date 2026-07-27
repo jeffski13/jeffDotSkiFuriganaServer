@@ -1,7 +1,7 @@
 import express, { type Express, type Request, type Response } from 'express';
 import { convertToFurigana } from './furigana.ts';
 
-const app: Express = express();
+export const app: Express = express();
 
 app.use(express.json());
 
@@ -25,5 +25,3 @@ app.post('/furiganaTransformation', async (req: Request, res: Response) => {
     res.status(500).json({ error: 'Failed to convert furigana.' });
   }
 });
-
-app.listen(3000);

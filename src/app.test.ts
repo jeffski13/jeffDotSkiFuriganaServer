@@ -1,0 +1,42 @@
+import { test } from 'node:test';
+import assert from 'node:assert/strict';
+import type { AddressInfo } from 'node:net';
+import { app } from './app.ts';
+
+const withServer = async (run: (baseUrl: string) => Promise<void>) => {
+  const server = app.listen(0);
+  try {
+    const { port } = server.address() as AddressInfo;
+    await run(`http://localhost:${port}`);
+  } finally {
+    server.close();
+  }
+};
+
+test('POST /furiganaTransformation returns 400 when the payload is not an array', async () => {
+  await withServer(async (baseUrl) => {
+    const response = await fetch(`${baseUrl}/furiganaTransformation`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ foo: 'bar' }),
+    });
+
+    assert.equal(response.status, 400);
+    const body = await response.json();
+    assert.equal(body.error, 'Request body must be an array of strings.');
+  });
+});
+
+test('POST /furiganaTransformation returns 400 when the array contains non-string items', async () => {
+  await withServer(async (baseUrl) => {
+    const response = await fetch(`${baseUrl}/furiganaTransformation`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(['漢字', 42]),
+    });
+
+    assert.equal(response.status, 400);
+    const body = await response.json();
+    assert.equal(body.error, 'Request body must be an array of strings.');
+  });
+});
