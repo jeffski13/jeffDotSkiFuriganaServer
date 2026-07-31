@@ -1,14 +1,18 @@
 export interface AmbiguousReading {
-  reading: string;
+  readingOutput: string;
   /** Manually updated count of times this reading has been encountered; used to pick the default reading. */
   count: number;
-  note: string;
+  note?: string;
 }
 
 export const ambiguousKanji: Record<string, AmbiguousReading[]> = {
   道標: [
-    { reading: 'どうひょう', count: 0, note: 'on-yomi compound reading; dictionary default, common in technical/formal contexts', },
-    { reading: 'みちしるべ', count: 1, note: 'kun-yomi reading; common in poetic and lyrical contexts (e.g. song lyrics)', },
+    { readingOutput: '道標（どうひょう）', count: 0, note: 'on-yomi compound reading; dictionary default, common in technical/formal contexts', },
+    { readingOutput: '道標（みちしるべ）', count: 1, note: 'kun-yomi reading; common in poetic and lyrical contexts (e.g. song lyrics)', },
+  ],
+  一人: [
+    { readingOutput: '一（いち）人（にん）', count: 0 },
+    { readingOutput: '一人（ひとり）', count: 1 },
   ],
 };
 

@@ -8,22 +8,29 @@ const KuromojiAnalyzer = require('kuroshiro-analyzer-kuromoji');
 const DELIMITER_START = '（';
 const DELIMITER_END = '）';
 
-const escapeRegExp = (value: string): string => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-
 /**
- * Replaces furigana readings for known ambiguous kanji with the most commonly
- * encountered reading, overriding whatever kuroshiro's dictionary picked.
+ * For every ambiguous kanji present in the original input, checks whether any of
+ * its known reading variants appear in kuroshiro's output, and if so replaces that
+ * variant with the most commonly encountered one, overriding kuroshiro's pick.
  */
-export const applyAmbiguousKanjiOverrides = (text: string): string => {
-  return Object.keys(ambiguousKanji).reduce((result, kanji) => {
+export const applyAmbiguousKanjiOverrides = (originalText: string, convertedText: string): string => {
+  return Object.entries(ambiguousKanji).reduce((result, [kanji, readings]) => {
+    if (!originalText.includes(kanji)) {
+      return result;
+    }
+
     const defaultReading = getDefaultReading(kanji);
     if (!defaultReading) {
       return result;
     }
 
-    const pattern = new RegExp(`${escapeRegExp(kanji)}${DELIMITER_START}[^${DELIMITER_END}]+${DELIMITER_END}`, 'g');
-    return result.replace(pattern, `${kanji}${DELIMITER_START}${defaultReading.reading}${DELIMITER_END}`);
-  }, text);
+    return readings.reduce((text, candidate) => {
+      if (candidate.readingOutput === defaultReading.readingOutput) {
+        return text;
+      }
+      return text.split(candidate.readingOutput).join(defaultReading.readingOutput);
+    }, result);
+  }, convertedText);
 };
 
 interface KuroshiroInstance {
@@ -49,5 +56,5 @@ export const convertToFurigana = async (text: string): Promise<string> => {
     delimiter_start: DELIMITER_START,
     delimiter_end: DELIMITER_END,
   });
-  return applyAmbiguousKanjiOverrides(converted);
+  return applyAmbiguousKanjiOverrides(text, converted);
 };
