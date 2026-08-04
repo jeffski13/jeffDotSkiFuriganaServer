@@ -14,6 +14,10 @@ export const ambiguousKanji: Record<string, AmbiguousReading[]> = {
     { readingOutput: '一（いち）人（にん）', count: 0 },
     { readingOutput: '一人（ひとり）', count: 1 },
   ],
+  日本: [
+    { readingOutput: '日本（にほん）', count: 1 },
+    { readingOutput: '日本（にっぽん）', count: 0 },
+  ],
 };
 
 /**
