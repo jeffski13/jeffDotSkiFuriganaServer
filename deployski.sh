@@ -27,7 +27,7 @@ else
   npm version patch
 fi
 
-gcloud run deploy --source . --regoin=us-east-1
+gcloud run deploy --source . --region=us-east1
 
 echo "commiting tags."
 git push --tags origin master
