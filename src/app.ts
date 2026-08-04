@@ -13,7 +13,8 @@ app.use((req: Request, _res: Response, next: NextFunction) => {
 });
 
 app.get('/', (req: Request, res: Response) => {
-  res.send('Hello World!');
+  const name = process.env.NAME || 'World';
+  res.send(`Hello ${name}!`);
 });
 
 app.post('/furiganaTransformation', async (req: Request, res: Response) => {

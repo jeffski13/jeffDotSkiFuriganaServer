@@ -2,10 +2,10 @@
   "name": "jeffdotskifuriganaserver",
   "version": "1.0.0",
   "description": "Furigana Conversion Server",
-  "main": "index.js",
+  "main": "src/server.js",
   "type": "module",
   "scripts": {
-    "start": "node index.js",
+    "start": "node src/server.ts",
     "startNodeServer": "node src/server.ts",
     "test": "node --test src/**/*.test.ts"
   },
