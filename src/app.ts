@@ -1,5 +1,6 @@
 import express, { type Express, type NextFunction, type Request, type Response } from 'express';
 import { convertToFurigana } from './furigana.ts';
+import packageJson from '../package.json' with { type: 'json' };
 
 export const app: Express = express();
 
@@ -13,7 +14,8 @@ app.use((req: Request, _res: Response, next: NextFunction) => {
 });
 
 app.get('/', (req: Request, res: Response) => {
-  res.send('Hello World!');
+  const name = process.env.NAME || 'World';
+  res.send(`Hello ${name}! (v${packageJson.version})`);
 });
 
 app.post('/furiganaTransformation', async (req: Request, res: Response) => {

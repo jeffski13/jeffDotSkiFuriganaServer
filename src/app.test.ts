@@ -2,6 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import type { AddressInfo } from 'node:net';
 import { app } from './app.ts';
+import packageJson from '../package.json' with { type: 'json' };
 
 const withServer = async (run: (baseUrl: string) => Promise<void>) => {
   const server = app.listen(0);
@@ -12,6 +13,16 @@ const withServer = async (run: (baseUrl: string) => Promise<void>) => {
     server.close();
   }
 };
+
+test('GET / returns a greeting including the package version', async () => {
+  await withServer(async (baseUrl) => {
+    const response = await fetch(baseUrl);
+
+    assert.equal(response.status, 200);
+    const body = await response.text();
+    assert.equal(body, `Hello World! (v${packageJson.version})`);
+  });
+});
 
 test('POST /furiganaTransformation returns 400 when the payload is not an array', async () => {
   await withServer(async (baseUrl) => {

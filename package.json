@@ -1,11 +1,12 @@
 {
   "name": "jeffdotskifuriganaserver",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "Furigana Conversion Server",
-  "main": "index.js",
+  "main": "src/server.js",
   "type": "module",
   "scripts": {
     "start": "node src/server.ts",
+    "startNodeServer": "node src/server.ts",
     "test": "node --test src/**/*.test.ts"
   },
   "author": "",
@@ -19,5 +20,9 @@
     "@types/express": "^5.0.6",
     "@types/node": "^26.1.2",
     "typescript": "^7.0.2"
+  },
+  "private": true,
+  "engines": {
+    "node": ">=16.0.0"
   }
 }
