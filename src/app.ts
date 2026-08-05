@@ -18,6 +18,19 @@ app.get('/', (req: Request, res: Response) => {
   res.send(`Hello ${name}! (v${packageJson.version})`);
 });
 
+app.use('/furiganaTransformation', (req: Request, res: Response, next: NextFunction) => {
+  res.header('Access-Control-Allow-Origin', 'https://jeff.ski');
+  res.header('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type');
+
+  if (req.method === 'OPTIONS') {
+    res.sendStatus(204);
+    return;
+  }
+
+  next();
+});
+
 app.post('/furiganaTransformation', async (req: Request, res: Response) => {
   const kanjiList: unknown = req.body;
 
