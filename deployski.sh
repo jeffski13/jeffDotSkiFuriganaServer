@@ -30,4 +30,4 @@ fi
 gcloud run deploy --source . --region=us-east1
 
 echo "commiting tags."
-git push --tags origin master
+git push --tags origin main
