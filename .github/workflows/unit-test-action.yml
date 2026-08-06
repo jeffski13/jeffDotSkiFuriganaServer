@@ -1,0 +1,17 @@
+name: unit-test-action
+run-name: ${{ github.actor }} triggered automated unit test run
+on:
+  pull_request:
+    types: [opened, reopened, synchronize]
+    branches:
+      - 'main'
+jobs:
+  unit-test-action:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '22'
+      - run: npm install
+      - run: npm run test
