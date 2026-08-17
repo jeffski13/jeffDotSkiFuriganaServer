@@ -22,6 +22,10 @@ export const ambiguousKanji: Record<string, AmbiguousReading[]> = {
     { readingOutput: '音（おと）', count: 1 },
     { readingOutput: '音（おん）', count: 0 },
   ],
+  君: [
+    { readingOutput: '君（きみ）', count: 1, note: '波乗りジョニー - Naminori Johnny' },
+    { readingOutput: '君（くん）', count: 0 },
+  ],
 };
 
 /**
