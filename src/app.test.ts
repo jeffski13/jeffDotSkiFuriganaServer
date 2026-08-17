@@ -80,7 +80,7 @@ test('POST /chorusSeparators returns 400 when the array contains non-string item
   });
 });
 
-test('POST /chorusSeparators inserts a separator above the most frequent line', async () => {
+test('POST /chorusSeparators wraps the most frequent line with separators above and below', async () => {
   await withServer(async (baseUrl) => {
     const response = await fetch(`${baseUrl}/chorusSeparators`, {
       method: 'POST',
@@ -94,9 +94,11 @@ test('POST /chorusSeparators inserts a separator above the most frequent line', 
       'verse one',
       '-----------------------------',
       'chorus',
+      '-----------------------------',
       'verse two',
       '-----------------------------',
       'chorus',
+      '-----------------------------',
     ]);
   });
 });
