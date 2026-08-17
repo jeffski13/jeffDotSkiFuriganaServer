@@ -51,3 +51,52 @@ test('POST /furiganaTransformation returns 400 when the array contains non-strin
     assert.equal(body.error, 'Request body must be an array of strings.');
   });
 });
+
+test('POST /chorusSeparators returns 400 when the payload is not an array', async () => {
+  await withServer(async (baseUrl) => {
+    const response = await fetch(`${baseUrl}/chorusSeparators`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ foo: 'bar' }),
+    });
+
+    assert.equal(response.status, 400);
+    const body = await response.json();
+    assert.equal(body.error, 'Request body must be an array of strings.');
+  });
+});
+
+test('POST /chorusSeparators returns 400 when the array contains non-string items', async () => {
+  await withServer(async (baseUrl) => {
+    const response = await fetch(`${baseUrl}/chorusSeparators`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(['漢字', 42]),
+    });
+
+    assert.equal(response.status, 400);
+    const body = await response.json();
+    assert.equal(body.error, 'Request body must be an array of strings.');
+  });
+});
+
+test('POST /chorusSeparators inserts a separator above the most frequent line', async () => {
+  await withServer(async (baseUrl) => {
+    const response = await fetch(`${baseUrl}/chorusSeparators`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(['verse one', 'chorus', 'verse two', 'chorus']),
+    });
+
+    assert.equal(response.status, 200);
+    const body = await response.json();
+    assert.deepEqual(body, [
+      'verse one',
+      '-----------------------------',
+      'chorus',
+      'verse two',
+      '-----------------------------',
+      'chorus',
+    ]);
+  });
+});
