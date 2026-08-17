@@ -18,6 +18,10 @@ export const ambiguousKanji: Record<string, AmbiguousReading[]> = {
     { readingOutput: '日本（にほん）', count: 1 },
     { readingOutput: '日本（にっぽん）', count: 0 },
   ],
+  音: [
+    { readingOutput: '音（おと）', count: 1 },
+    { readingOutput: '音（おん）', count: 0 },
+  ],
 };
 
 /**
