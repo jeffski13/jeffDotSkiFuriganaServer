@@ -4,13 +4,16 @@ type Token = { kind: 'line'; text: string } | { kind: 'sep'; type: 'top' | 'bott
 
 /**
  * Marks the boundaries of the most-repeated block of lines:
- *  - the "top" line (most repeats, ties broken by earliest first
- *    occurrence) gets CHORUS_SEPARATOR inserted above every occurrence.
  *  - the "bottom" line (most repeats, ties broken by latest last
  *    occurrence) gets CHORUS_SEPARATOR inserted below every occurrence.
- * When there's no tie, both roles land on the same line, so it gets
- * wrapped above and below. Blank/whitespace-only lines are ignored when
- * counting repeats. If no line repeats, the input is returned as-is.
+ *  - the "top" line (most repeats among lines other than the bottom
+ *    winner, ties broken by earliest first occurrence) gets
+ *    CHORUS_SEPARATOR inserted above every occurrence.
+ * The top and bottom winners are never the same line, unless the bottom
+ * winner is the only line that repeats at all - in that case it wins
+ * both roles and gets wrapped above and below. Blank/whitespace-only
+ * lines are ignored when counting repeats. If no line repeats, the
+ * input is returned as-is.
  *
  * A second pass then looks at every "top" separator immediately followed,
  * with no other separator in between, by a "bottom" separator - i.e. a
@@ -39,8 +42,6 @@ export const insertChorusSeparators = (lines: string[]): string[] => {
     lastIndex.set(line, index);
   });
 
-  let topWinner: string | undefined;
-  let topCount = 0;
   let bottomWinner: string | undefined;
   let bottomCount = 0;
 
@@ -49,15 +50,28 @@ export const insertChorusSeparators = (lines: string[]): string[] => {
       continue;
     }
 
-    if (topWinner === undefined || count > topCount || (count === topCount && firstIndex.get(line)! < firstIndex.get(topWinner)!)) {
-      topWinner = line;
-      topCount = count;
-    }
-
     if (bottomWinner === undefined || count > bottomCount || (count === bottomCount && lastIndex.get(line)! > lastIndex.get(bottomWinner)!)) {
       bottomWinner = line;
       bottomCount = count;
     }
+  }
+
+  let topWinner: string | undefined;
+  let topCount = 0;
+
+  for (const [line, count] of counts) {
+    if (count < 2 || line === bottomWinner) {
+      continue;
+    }
+
+    if (topWinner === undefined || count > topCount || (count === topCount && firstIndex.get(line)! < firstIndex.get(topWinner)!)) {
+      topWinner = line;
+      topCount = count;
+    }
+  }
+
+  if (topWinner === undefined) {
+    topWinner = bottomWinner;
   }
 
   if (!topWinner && !bottomWinner) {

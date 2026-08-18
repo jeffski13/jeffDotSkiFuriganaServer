@@ -144,6 +144,63 @@ test('insertChorusSeparators also splits above the bottom separator when triple 
   ]);
 });
 
+test('insertChorusSeparators picks a different top winner when the most-repeated line would otherwise win both roles', () => {
+  // "今でもあなたはわたしの光" repeats 3 times (the overall most common line) and
+  // naturally wins the bottom role. Since top and bottom can't be the same line,
+  // the top role falls to the earliest-first-occurrence line among the next most
+  // common (count 2): "あの日の悲しみさえ あの日の苦しみさえ".
+  const lines = [
+    '夢ならばどれほどよかったでしょう',
+    '未だにあなたのことを夢にみる',
+    '忘れた物を取りに帰るように',
+    '古びた思い出の埃を払う',
+    '戻らない幸せがあることを',
+    '最後にあなたが教えてくれた',
+    '言えずに隠してた昏い過去も',
+    'あなたがいなきゃ永遠に昏いまま',
+    'きっともうこれ以上傷つくことなど',
+    'ありはしないとわかっている',
+    'あの日の悲しみさえ あの日の苦しみさえ',
+    'そのすべてを愛してた あなたとともに',
+    '胸に残り離れない 苦いレモンの匂い',
+    '雨が降り止むまでは帰れない',
+    '今でもあなたはわたしの光',
+    '暗闇であなたの背をなぞった',
+    'その輪郭を鮮明に覚えている',
+    '受け止めきれないものと出会うたび',
+    '溢れてやまないのは涙だけ',
+    '何をしていたの 何を見ていたの',
+    'わたしの知らない横顔で',
+    'どこかであなたが今',
+    'わたしと同じ様な',
+    '涙にくれ淋しさの中にいるなら',
+    'わたしのことなどどうか忘れてください',
+    'そんなことを心から願うほどに',
+    '今でもあなたはわたしの光',
+    '自分が思うより 恋をしていたあなたに',
+    'あれから思うように 息ができない',
+    'あんなに側にいたのに まるで嘘みたい',
+    'とても忘れられない それだけが確か',
+    'あの日の悲しみさえ あの日の苦しみさえ',
+    'そのすべてを愛してた あなたとともに',
+    '胸に残り離れない苦いレモンの匂い',
+    '雨が降り止むまでは帰れない',
+    '切り分けた果実の片方の様に',
+    '今でもあなたはわたしの光',
+  ];
+
+  const result = insertChorusSeparators(lines);
+
+  assert.equal(result[10], CHORUS_SEPARATOR); // above line 11 (index 10)
+  assert.equal(result[11], 'あの日の悲しみさえ あの日の苦しみさえ');
+  assert.equal(result[result.indexOf('今でもあなたはわたしの光') + 1], CHORUS_SEPARATOR); // below first occurrence (line 15)
+  assert.equal(
+    result[result.lastIndexOf('今でもあなたはわたしの光') + 1],
+    CHORUS_SEPARATOR,
+  ); // below last occurrence (line 37)
+  assert.equal(result.filter((line) => line === CHORUS_SEPARATOR).length, 5);
+});
+
 test('insertChorusSeparators ignores blank lines when counting repeats', () => {
   const lines = ['', '', '', 'サビ', '間奏', 'サビ'];
   const result = insertChorusSeparators(lines);
