@@ -21,6 +21,11 @@ do
   flagsProcessed=$((flagsProcessed+1))
 done
 
+if ! command -v gcloud &> /dev/null; then
+  echo "Error: gcloud CLI is not installed. Install the Google Cloud SDK before deploying."
+  exit 1
+fi
+
 if [ "$isMinorPatch" = true ] ; then
   npm version minor
 else
