@@ -1,6 +1,6 @@
 {
   "name": "jeffdotskifuriganaserver",
-  "version": "1.0.9",
+  "version": "1.1.0",
   "description": "Furigana Conversion Server",
   "main": "src/server.js",
   "type": "module",
