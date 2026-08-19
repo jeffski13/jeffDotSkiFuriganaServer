@@ -1,5 +1,7 @@
 export const CHORUS_SEPARATOR = '-----------------------------';
 
+export const isNonProductionEnvironment = (): boolean => process.env.NODE_ENV !== 'production';
+
 type Token = { kind: 'line'; text: string } | { kind: 'sep'; type: 'top' | 'bottom' };
 
 /**
@@ -78,6 +80,11 @@ export const insertChorusSeparators = (lines: string[]): string[] => {
 
   if (!topWinner && !bottomWinner) {
     return lines.slice();
+  }
+
+  if (isNonProductionEnvironment()) {
+    console.log('Topmost common line:', topWinner);
+    console.log('Bottommost common line:', bottomWinner);
   }
 
   const tokens: Token[] = [];

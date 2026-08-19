@@ -1,6 +1,26 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { CHORUS_SEPARATOR, insertChorusSeparators } from './chorusSeparators.ts';
+import { CHORUS_SEPARATOR, insertChorusSeparators, isNonProductionEnvironment } from './chorusSeparators.ts';
+
+test('isNonProductionEnvironment returns false when NODE_ENV is production', () => {
+  const original = process.env.NODE_ENV;
+  process.env.NODE_ENV = 'production';
+  try {
+    assert.equal(isNonProductionEnvironment(), false);
+  } finally {
+    process.env.NODE_ENV = original;
+  }
+});
+
+test('isNonProductionEnvironment returns true when NODE_ENV is not production', () => {
+  const original = process.env.NODE_ENV;
+  process.env.NODE_ENV = 'development';
+  try {
+    assert.equal(isNonProductionEnvironment(), true);
+  } finally {
+    process.env.NODE_ENV = original;
+  }
+});
 
 test('insertChorusSeparators also splits an oversized instance of the repeated block at smallestNumOfLines', () => {
   const lines = [
