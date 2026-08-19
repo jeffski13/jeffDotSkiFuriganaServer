@@ -26,6 +26,10 @@ export const ambiguousKanji: Record<string, AmbiguousReading[]> = {
     { readingOutput: '君（きみ）', count: 1, note: '波乗りジョニー - Naminori Johnny' },
     { readingOutput: '君（くん）', count: 0 },
   ],
+  今確かに: [
+    { readingOutput: '今（いま）確（たし）かに', count: 1, note: '理由 - ゆず' },
+    { readingOutput: '今（こん）確（たし）かに', count: 0 },
+  ],
 };
 
 /**
