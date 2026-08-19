@@ -71,7 +71,6 @@ test('insertChorusSeparators also splits an oversized instance of the repeated b
     '君の為に出来る事見つけるのさ',
     '空の彼方まで',
     '旅に出かけよう',
-    CHORUS_SEPARATOR,
   ]);
 });
 
@@ -80,17 +79,18 @@ test('insertChorusSeparators returns the input unchanged when no line repeats', 
   assert.deepEqual(insertChorusSeparators(lines), lines);
 });
 
-test('insertChorusSeparators wraps every occurrence when the same line wins both roles', () => {
+test('insertChorusSeparators wraps every occurrence when the same line wins both roles, but never at the very start or end', () => {
   const lines = ['サビ', 'verse', 'サビ'];
   const result = insertChorusSeparators(lines);
-  assert.deepEqual(result, [CHORUS_SEPARATOR, 'サビ', CHORUS_SEPARATOR, 'verse', CHORUS_SEPARATOR, 'サビ', CHORUS_SEPARATOR]);
+  assert.deepEqual(result, ['サビ', CHORUS_SEPARATOR, 'verse', CHORUS_SEPARATOR, 'サビ']);
 });
 
-test('insertChorusSeparators picks the top winner by earliest first occurrence and the bottom winner by latest last occurrence among ties', () => {
+test('insertChorusSeparators picks the top winner by earliest first occurrence and the bottom winner by latest last occurrence among ties, but never separates at the very start or end', () => {
   const lines = ['A', 'B', 'A', 'B'];
   const result = insertChorusSeparators(lines);
   // A ties B on count; A occurs first (top winner, marked above), B occurs last (bottom winner, marked below).
-  assert.deepEqual(result, [CHORUS_SEPARATOR, 'A', 'B', CHORUS_SEPARATOR, CHORUS_SEPARATOR, 'A', 'B', CHORUS_SEPARATOR]);
+  // A is the first line and B is the last line, so their separators are suppressed.
+  assert.deepEqual(result, ['A', 'B', CHORUS_SEPARATOR, CHORUS_SEPARATOR, 'A', 'B']);
 });
 
 test('insertChorusSeparators splits only the instance that is double or more of the smallest instance', () => {
@@ -100,8 +100,8 @@ test('insertChorusSeparators splits only the instance that is double or more of 
   // smallest, so it gets an extra separator 2 lines below its top separator.
   const lines = ['TOP', 'BOT', 'mid1', 'mid2', 'TOP', 'filler1', 'filler2', 'BOT'];
   const result = insertChorusSeparators(lines);
+  // TOP is the first line and BOT is the last line, so their separators are suppressed.
   assert.deepEqual(result, [
-    CHORUS_SEPARATOR,
     'TOP',
     'BOT',
     CHORUS_SEPARATOR,
@@ -113,7 +113,6 @@ test('insertChorusSeparators splits only the instance that is double or more of 
     CHORUS_SEPARATOR,
     'filler2',
     'BOT',
-    CHORUS_SEPARATOR,
   ]);
 });
 
@@ -123,8 +122,8 @@ test('insertChorusSeparators also splits above the bottom separator when triple 
   // 2 lines above its bottom separator, in addition to the one 2 lines below its top.
   const lines = ['TOP', 'BOT', 'mid1', 'mid2', 'TOP', 'a', 'b', 'c', 'd', 'e', 'BOT'];
   const result = insertChorusSeparators(lines);
+  // TOP is the first line and BOT is the last line, so their separators are suppressed.
   assert.deepEqual(result, [
-    CHORUS_SEPARATOR,
     'TOP',
     'BOT',
     CHORUS_SEPARATOR,
@@ -140,7 +139,6 @@ test('insertChorusSeparators also splits above the bottom separator when triple 
     CHORUS_SEPARATOR,
     'e',
     'BOT',
-    CHORUS_SEPARATOR,
   ]);
 });
 
@@ -194,15 +192,23 @@ test('insertChorusSeparators picks a different top winner when the most-repeated
   assert.equal(result[10], CHORUS_SEPARATOR); // above line 11 (index 10)
   assert.equal(result[11], 'あの日の悲しみさえ あの日の苦しみさえ');
   assert.equal(result[result.indexOf('今でもあなたはわたしの光') + 1], CHORUS_SEPARATOR); // below first occurrence (line 15)
-  assert.equal(
-    result[result.lastIndexOf('今でもあなたはわたしの光') + 1],
-    CHORUS_SEPARATOR,
-  ); // below last occurrence (line 37)
-  assert.equal(result.filter((line) => line === CHORUS_SEPARATOR).length, 5);
+  // The last occurrence (line 37) is also the last line of the input, so its
+  // separator is suppressed - no separator at the very end of the output.
+  assert.equal(result[result.length - 1], '今でもあなたはわたしの光');
+  assert.equal(result.filter((line) => line === CHORUS_SEPARATOR).length, 4);
 });
 
 test('insertChorusSeparators ignores blank lines when counting repeats', () => {
   const lines = ['', '', '', 'サビ', '間奏', 'サビ'];
   const result = insertChorusSeparators(lines);
-  assert.deepEqual(result, ['', '', '', CHORUS_SEPARATOR, 'サビ', CHORUS_SEPARATOR, '間奏', CHORUS_SEPARATOR, 'サビ', CHORUS_SEPARATOR]);
+  // The last occurrence of 'サビ' is also the last line, so its separator is suppressed.
+  assert.deepEqual(result, ['', '', '', CHORUS_SEPARATOR, 'サビ', CHORUS_SEPARATOR, '間奏', CHORUS_SEPARATOR, 'サビ']);
+});
+
+test('insertChorusSeparators never places a separator as the very first or very last element', () => {
+  const lines = ['サビ', 'verse1', 'サビ', 'verse2', 'サビ'];
+  const result = insertChorusSeparators(lines);
+  assert.notEqual(result[0], CHORUS_SEPARATOR);
+  assert.notEqual(result[result.length - 1], CHORUS_SEPARATOR);
+  assert.deepEqual(result, ['サビ', CHORUS_SEPARATOR, 'verse1', CHORUS_SEPARATOR, 'サビ', CHORUS_SEPARATOR, 'verse2', CHORUS_SEPARATOR, 'サビ']);
 });
