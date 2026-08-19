@@ -13,7 +13,9 @@ type Token = { kind: 'line'; text: string } | { kind: 'sep'; type: 'top' | 'bott
  * winner is the only line that repeats at all - in that case it wins
  * both roles and gets wrapped above and below. Blank/whitespace-only
  * lines are ignored when counting repeats. If no line repeats, the
- * input is returned as-is.
+ * input is returned as-is. No separator is ever inserted at the very
+ * beginning or the very end of the output, even if the top or bottom
+ * winner's first/last occurrence is the first/last line.
  *
  * A second pass then looks at every "top" separator immediately followed,
  * with no other separator in between, by a "bottom" separator - i.e. a
@@ -108,7 +110,7 @@ export const insertChorusSeparators = (lines: string[]): string[] => {
   }
 
   if (instances.length === 0) {
-    return tokens.map((token) => (token.kind === 'sep' ? CHORUS_SEPARATOR : token.text));
+    return trimBoundarySeparators(tokens.map((token) => (token.kind === 'sep' ? CHORUS_SEPARATOR : token.text)));
   }
 
   const smallestNumOfLines = Math.min(...instances.map((instance) => instance.gapLines));
@@ -137,5 +139,18 @@ export const insertChorusSeparators = (lines: string[]): string[] => {
     }
     result.push(token.kind === 'sep' ? CHORUS_SEPARATOR : token.text);
   });
+  return trimBoundarySeparators(result);
+};
+
+// A separator is never allowed to be the very first or very last element of
+// the output, even if the top or bottom winner's first/last occurrence is
+// the first/last line - so strip one off either end if present.
+const trimBoundarySeparators = (result: string[]): string[] => {
+  if (result[0] === CHORUS_SEPARATOR) {
+    result = result.slice(1);
+  }
+  if (result[result.length - 1] === CHORUS_SEPARATOR) {
+    result = result.slice(0, -1);
+  }
   return result;
 };

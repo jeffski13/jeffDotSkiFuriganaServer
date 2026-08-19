@@ -98,7 +98,6 @@ test('POST /chorusSeparators wraps the most frequent line with separators above 
       'verse two',
       '-----------------------------',
       'chorus',
-      '-----------------------------',
     ]);
   });
 });
