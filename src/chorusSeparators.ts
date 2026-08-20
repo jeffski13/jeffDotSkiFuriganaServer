@@ -2,7 +2,25 @@ export const CHORUS_SEPARATOR = '-----------------------------';
 
 export const isNonProductionEnvironment = (): boolean => process.env.NODE_ENV !== 'production';
 
+// Guards against runaway extension of the chorus boundaries.
+const MAX_BOUNDARY_EXTENSIONS = 5;
+
 type Token = { kind: 'line'; text: string } | { kind: 'sep'; type: 'top' | 'bottom' };
+
+// True if the same non-blank value appears at least twice in values.
+const hasRepeatedLine = (values: string[]): boolean => {
+  const seen = new Set<string>();
+  for (const value of values) {
+    if (value.trim() === '') {
+      continue;
+    }
+    if (seen.has(value)) {
+      return true;
+    }
+    seen.add(value);
+  }
+  return false;
+};
 
 /**
  * Marks the boundaries of the most-repeated block of lines:
@@ -19,6 +37,16 @@ type Token = { kind: 'line'; text: string } | { kind: 'sep'; type: 'top' | 'bott
  * beginning or the very end of the output, even if the top or bottom
  * winner's first/last occurrence is the first/last line.
  *
+ * Once the top and bottom separators are placed, each boundary is checked
+ * for extension: if the line directly above the topmost separator repeats
+ * (at least two occurrences share the same, non-blank text) across the
+ * top separator's instances, every top separator moves up one line to
+ * absorb it, and the check repeats against the new line above - up to
+ * MAX_BOUNDARY_EXTENSIONS times. The bottommost separator is extended
+ * the same way in the opposite direction, checking the line below and
+ * moving every bottom separator down one line, also capped at
+ * MAX_BOUNDARY_EXTENSIONS times.
+ *
  * A second pass then looks at every "top" separator immediately followed,
  * with no other separator in between, by a "bottom" separator - i.e. a
  * full instance of the repeated block - and finds the shortest such
@@ -29,6 +57,10 @@ type Token = { kind: 'line'; text: string } | { kind: 'sep'; type: 'top' | 'bott
  * more of smallestNumOfLines), it also gets a separator inserted
  * smallestNumOfLines lines above its bottom separator. This pass runs
  * once, against the original top/bottom separators only.
+ *
+ * Finally, any run of adjacent separators (e.g. a bottom separator
+ * immediately followed by a top separator with no line between them) is
+ * collapsed down to a single separator.
  */
 export const insertChorusSeparators = (lines: string[]): string[] => {
   const counts = new Map<string, number>();
@@ -87,16 +119,52 @@ export const insertChorusSeparators = (lines: string[]): string[] => {
     console.log('Bottommost common line:', bottomWinner);
   }
 
-  const tokens: Token[] = [];
-  for (const line of lines) {
+  let topBoundaryIndexes: number[] = [];
+  let bottomBoundaryIndexes: number[] = [];
+  lines.forEach((line, index) => {
     if (line === topWinner) {
+      topBoundaryIndexes.push(index);
+    }
+    if (line === bottomWinner) {
+      bottomBoundaryIndexes.push(index);
+    }
+  });
+
+  for (let attempt = 0; attempt < MAX_BOUNDARY_EXTENSIONS; attempt++) {
+    if (topBoundaryIndexes.some((index) => index === 0)) {
+      break;
+    }
+    const linesAbove = topBoundaryIndexes.map((index) => lines[index - 1]);
+    if (!hasRepeatedLine(linesAbove)) {
+      break;
+    }
+    topBoundaryIndexes = topBoundaryIndexes.map((index) => index - 1);
+  }
+
+  for (let attempt = 0; attempt < MAX_BOUNDARY_EXTENSIONS; attempt++) {
+    if (bottomBoundaryIndexes.some((index) => index === lines.length - 1)) {
+      break;
+    }
+    const linesBelow = bottomBoundaryIndexes.map((index) => lines[index + 1]);
+    if (!hasRepeatedLine(linesBelow)) {
+      break;
+    }
+    bottomBoundaryIndexes = bottomBoundaryIndexes.map((index) => index + 1);
+  }
+
+  const topBoundarySet = new Set(topBoundaryIndexes);
+  const bottomBoundarySet = new Set(bottomBoundaryIndexes);
+
+  const tokens: Token[] = [];
+  lines.forEach((line, index) => {
+    if (topBoundarySet.has(index)) {
       tokens.push({ kind: 'sep', type: 'top' });
     }
     tokens.push({ kind: 'line', text: line });
-    if (line === bottomWinner) {
+    if (bottomBoundarySet.has(index)) {
       tokens.push({ kind: 'sep', type: 'bottom' });
     }
-  }
+  });
 
   const sepIndexes: number[] = [];
   tokens.forEach((token, index) => {
@@ -117,7 +185,7 @@ export const insertChorusSeparators = (lines: string[]): string[] => {
   }
 
   if (instances.length === 0) {
-    return trimBoundarySeparators(tokens.map((token) => (token.kind === 'sep' ? CHORUS_SEPARATOR : token.text)));
+    return trimBoundarySeparators(collapseAdjacentSeparators(tokens.map((token) => (token.kind === 'sep' ? CHORUS_SEPARATOR : token.text))));
   }
 
   const smallestNumOfLines = Math.min(...instances.map((instance) => instance.gapLines));
@@ -146,7 +214,7 @@ export const insertChorusSeparators = (lines: string[]): string[] => {
     }
     result.push(token.kind === 'sep' ? CHORUS_SEPARATOR : token.text);
   });
-  return trimBoundarySeparators(result);
+  return trimBoundarySeparators(collapseAdjacentSeparators(result));
 };
 
 // A separator is never allowed to be the very first or very last element of
@@ -160,4 +228,18 @@ const trimBoundarySeparators = (result: string[]): string[] => {
     result = result.slice(0, -1);
   }
   return result;
+};
+
+// Two separators can end up back to back (e.g. a bottom separator immediately
+// followed by a top separator with no line between them). Collapse any run of
+// adjacent separators down to a single one.
+const collapseAdjacentSeparators = (result: string[]): string[] => {
+  const collapsed: string[] = [];
+  for (const line of result) {
+    if (line === CHORUS_SEPARATOR && collapsed[collapsed.length - 1] === CHORUS_SEPARATOR) {
+      continue;
+    }
+    collapsed.push(line);
+  }
+  return collapsed;
 };
