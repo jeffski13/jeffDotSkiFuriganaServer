@@ -308,6 +308,9 @@ const insertSeparatorsForRepeatedLinePairs = (result: string[]): string[] => {
 
     if (!aboveWindow.includes(CHORUS_SEPARATOR) && !belowWindow.includes(CHORUS_SEPARATOR)) {
       insertBefore.add(index);
+      if (isNonProductionEnvironment()) {
+        console.log('Repeated line pair marked with a separator:', top, '/', bottom);
+      }
     }
   }
 
