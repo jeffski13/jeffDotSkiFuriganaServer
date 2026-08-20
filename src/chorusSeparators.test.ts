@@ -232,3 +232,122 @@ test('insertChorusSeparators never places a separator as the very first or very 
   assert.notEqual(result[result.length - 1], CHORUS_SEPARATOR);
   assert.deepEqual(result, ['サビ', CHORUS_SEPARATOR, 'verse1', CHORUS_SEPARATOR, 'サビ', CHORUS_SEPARATOR, 'verse2', CHORUS_SEPARATOR, 'サビ']);
 });
+
+test('insertChorusSeparators moves the top separator up one line when the line above it repeats across instances', () => {
+  // TOP occurs 3 times, so it beats 'echo' (count 2) for the top role outright.
+  // BOT occurs 3 times with the latest last occurrence, so it wins the bottom role.
+  // 'echo' sits directly above TOP's 1st and 2nd occurrences (a repeated match),
+  // so every top separator should move up one line to absorb it. The 3rd
+  // occurrence's line above ('unique3') doesn't match anything, but it still
+  // moves in lockstep since the rule moves *all* top separators together.
+  // The line above the new position (index 0) doesn't exist, so it stops there
+  // after exactly one move.
+  const lines = ['echo', 'TOP', 'gap1', 'BOT', 'gap2', 'echo', 'TOP', 'gap3', 'BOT', 'gap4', 'unique3', 'TOP', 'gap5', 'BOT'];
+  const result = insertChorusSeparators(lines);
+  assert.deepEqual(result, [
+    'echo',
+    'TOP',
+    'gap1',
+    'BOT',
+    CHORUS_SEPARATOR,
+    'gap2',
+    CHORUS_SEPARATOR,
+    'echo',
+    'TOP',
+    'gap3',
+    'BOT',
+    CHORUS_SEPARATOR,
+    'gap4',
+    CHORUS_SEPARATOR,
+    'unique3',
+    'TOP',
+    'gap5',
+    'BOT',
+  ]);
+});
+
+test('insertChorusSeparators moves the bottom separator down one line when the line below it repeats across instances', () => {
+  // Mirror of the top-moving-up case: BOT occurs 3 times and wins the bottom role
+  // (latest last occurrence). TOP occurs 3 times at the very start of each
+  // section (so its own extension check breaks immediately with no line above).
+  // 'echo2' sits directly below BOT's 1st and 2nd occurrences, so every bottom
+  // separator moves down one line to absorb it; the 3rd occurrence's line below
+  // ('unique_end') doesn't match, but moves along with the rest. The line below
+  // the new position is the very last line, so it stops there after one move.
+  const lines = ['TOP', 'gap1', 'BOT', 'echo2', 'gap2', 'TOP', 'gap3', 'BOT', 'echo2', 'gap4', 'TOP', 'gap5', 'BOT', 'unique_end'];
+  const result = insertChorusSeparators(lines);
+  assert.deepEqual(result, [
+    'TOP',
+    'gap1',
+    'BOT',
+    'echo2',
+    CHORUS_SEPARATOR,
+    'gap2',
+    CHORUS_SEPARATOR,
+    'TOP',
+    'gap3',
+    'BOT',
+    'echo2',
+    CHORUS_SEPARATOR,
+    'gap4',
+    CHORUS_SEPARATOR,
+    'TOP',
+    'gap5',
+    'BOT',
+    'unique_end',
+  ]);
+});
+
+test('insertChorusSeparators stops extending the top separator after 5 attempts even if the line above still repeats', () => {
+  // TOP occurs 3 times (count 3 beats every F-level's count of 2 outright).
+  // BOT occurs 3 times with the latest last occurrence, winning the bottom role.
+  // The 1st and 2nd TOP occurrences are each preceded by the same chain
+  // F5,F4,F3,F2,F1,F0 (F0 closest to TOP) - every level matches, which would
+  // keep moving the top separator up forever without a cap. The 3rd occurrence
+  // is preceded by a non-matching chain (U5..U0) and just rides along.
+  // With the 5-attempt cap, the separator should end up just above F4 (5 moves:
+  // absorbing F0, F1, F2, F3, then landing above F4) - F5 is never reached even
+  // though it would also have matched.
+  const lines = [
+    'F5', 'F4', 'F3', 'F2', 'F1', 'F0', 'TOP', 'gapA', 'BOT', 'gapB',
+    'F5', 'F4', 'F3', 'F2', 'F1', 'F0', 'TOP', 'gapC', 'BOT', 'gapD',
+    'U5', 'U4', 'U3', 'U2', 'U1', 'U0', 'TOP', 'gapE', 'BOT',
+  ];
+  const result = insertChorusSeparators(lines);
+  assert.deepEqual(result, [
+    'F5',
+    CHORUS_SEPARATOR,
+    'F4',
+    'F3',
+    'F2',
+    'F1',
+    'F0',
+    'TOP',
+    'gapA',
+    'BOT',
+    CHORUS_SEPARATOR,
+    'gapB',
+    'F5',
+    CHORUS_SEPARATOR,
+    'F4',
+    'F3',
+    'F2',
+    'F1',
+    'F0',
+    'TOP',
+    'gapC',
+    'BOT',
+    CHORUS_SEPARATOR,
+    'gapD',
+    'U5',
+    CHORUS_SEPARATOR,
+    'U4',
+    'U3',
+    'U2',
+    'U1',
+    'U0',
+    'TOP',
+    'gapE',
+    'BOT',
+  ]);
+});
