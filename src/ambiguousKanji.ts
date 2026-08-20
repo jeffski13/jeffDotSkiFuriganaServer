@@ -30,6 +30,10 @@ export const ambiguousKanji: Record<string, AmbiguousReading[]> = {
     { readingOutput: '今（いま）確（たし）かに', count: 1, note: '理由 - ゆず' },
     { readingOutput: '今（こん）確（たし）かに', count: 0 },
   ],
+  傍: [
+    { readingOutput: '傍（そば）', count: 1, note: '理由 - ゆず' },
+    { readingOutput: '傍（はた）', count: 0 },
+  ],
 };
 
 /**
