@@ -109,8 +109,9 @@ test('insertChorusSeparators picks the top winner by earliest first occurrence a
   const lines = ['A', 'B', 'A', 'B'];
   const result = insertChorusSeparators(lines);
   // A ties B on count; A occurs first (top winner, marked above), B occurs last (bottom winner, marked below).
-  // A is the first line and B is the last line, so their separators are suppressed.
-  assert.deepEqual(result, ['A', 'B', CHORUS_SEPARATOR, CHORUS_SEPARATOR, 'A', 'B']);
+  // A is the first line and B is the last line, so their separators are suppressed. B's bottom separator and
+  // A's top separator land back to back (no line between them), so they collapse into one.
+  assert.deepEqual(result, ['A', 'B', CHORUS_SEPARATOR, 'A', 'B']);
 });
 
 test('insertChorusSeparators splits only the instance that is double or more of the smallest instance', () => {
@@ -350,4 +351,14 @@ test('insertChorusSeparators stops extending the top separator after 5 attempts 
     'gapE',
     'BOT',
   ]);
+});
+
+test('insertChorusSeparators collapses adjacent separators into one', () => {
+  // BOT's 1st occurrence (index 2) is immediately followed by TOP's 2nd
+  // occurrence (index 3) with no line between them, so the raw token stream
+  // would place a bottom separator directly next to a top separator. Those
+  // should collapse into a single separator.
+  const lines = ['pre', 'TOP', 'BOT', 'TOP', 'post', 'BOT', 'tail'];
+  const result = insertChorusSeparators(lines);
+  assert.deepEqual(result, ['pre', CHORUS_SEPARATOR, 'TOP', 'BOT', CHORUS_SEPARATOR, 'TOP', 'post', 'BOT', CHORUS_SEPARATOR, 'tail']);
 });

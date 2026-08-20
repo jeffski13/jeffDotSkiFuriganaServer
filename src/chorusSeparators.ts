@@ -57,6 +57,10 @@ const hasRepeatedLine = (values: string[]): boolean => {
  * more of smallestNumOfLines), it also gets a separator inserted
  * smallestNumOfLines lines above its bottom separator. This pass runs
  * once, against the original top/bottom separators only.
+ *
+ * Finally, any run of adjacent separators (e.g. a bottom separator
+ * immediately followed by a top separator with no line between them) is
+ * collapsed down to a single separator.
  */
 export const insertChorusSeparators = (lines: string[]): string[] => {
   const counts = new Map<string, number>();
@@ -181,7 +185,7 @@ export const insertChorusSeparators = (lines: string[]): string[] => {
   }
 
   if (instances.length === 0) {
-    return trimBoundarySeparators(tokens.map((token) => (token.kind === 'sep' ? CHORUS_SEPARATOR : token.text)));
+    return trimBoundarySeparators(collapseAdjacentSeparators(tokens.map((token) => (token.kind === 'sep' ? CHORUS_SEPARATOR : token.text))));
   }
 
   const smallestNumOfLines = Math.min(...instances.map((instance) => instance.gapLines));
@@ -210,7 +214,7 @@ export const insertChorusSeparators = (lines: string[]): string[] => {
     }
     result.push(token.kind === 'sep' ? CHORUS_SEPARATOR : token.text);
   });
-  return trimBoundarySeparators(result);
+  return trimBoundarySeparators(collapseAdjacentSeparators(result));
 };
 
 // A separator is never allowed to be the very first or very last element of
@@ -224,4 +228,18 @@ const trimBoundarySeparators = (result: string[]): string[] => {
     result = result.slice(0, -1);
   }
   return result;
+};
+
+// Two separators can end up back to back (e.g. a bottom separator immediately
+// followed by a top separator with no line between them). Collapse any run of
+// adjacent separators down to a single one.
+const collapseAdjacentSeparators = (result: string[]): string[] => {
+  const collapsed: string[] = [];
+  for (const line of result) {
+    if (line === CHORUS_SEPARATOR && collapsed[collapsed.length - 1] === CHORUS_SEPARATOR) {
+      continue;
+    }
+    collapsed.push(line);
+  }
+  return collapsed;
 };
