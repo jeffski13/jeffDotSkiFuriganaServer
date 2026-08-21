@@ -226,6 +226,15 @@ test('insertChorusSeparators ignores blank lines when counting repeats', () => {
   assert.deepEqual(result, ['', '', '', CHORUS_SEPARATOR, 'サビ', CHORUS_SEPARATOR, '間奏', CHORUS_SEPARATOR, 'サビ']);
 });
 
+test('insertChorusSeparators treats lines as the same when they only differ by spacing', () => {
+  // 'サビ' and 'サ ビ' are the same line once whitespace is stripped for
+  // comparison, so they should both count as occurrences of the winner - but
+  // the original spacing of each occurrence is preserved in the output.
+  const lines = ['サビ', 'verse', 'サ ビ'];
+  const result = insertChorusSeparators(lines);
+  assert.deepEqual(result, ['サビ', CHORUS_SEPARATOR, 'verse', CHORUS_SEPARATOR, 'サ ビ']);
+});
+
 test('insertChorusSeparators never places a separator as the very first or very last element', () => {
   const lines = ['サビ', 'verse1', 'サビ', 'verse2', 'サビ'];
   const result = insertChorusSeparators(lines);
@@ -309,6 +318,12 @@ test('insertChorusSeparators stops extending the top separator after 5 attempts 
   // With the 5-attempt cap, the separator should end up just above F4 (5 moves:
   // absorbing F0, F1, F2, F3, then landing above F4) - F5 is never reached even
   // though it would also have matched.
+  //
+  // Additionally, the pair "F0" followed by "TOP" occurs twice as a unit (once
+  // in each F-chain), and neither occurrence has a separator within 4 lines
+  // above or 2 lines below it (the boundary separator sits 5 lines above F0 -
+  // just outside the window), so the final repeated-pair pass adds a separator
+  // above each occurrence's F0.
   const lines = [
     'F5', 'F4', 'F3', 'F2', 'F1', 'F0', 'TOP', 'gapA', 'BOT', 'gapB',
     'F5', 'F4', 'F3', 'F2', 'F1', 'F0', 'TOP', 'gapC', 'BOT', 'gapD',
@@ -322,6 +337,7 @@ test('insertChorusSeparators stops extending the top separator after 5 attempts 
     'F3',
     'F2',
     'F1',
+    CHORUS_SEPARATOR,
     'F0',
     'TOP',
     'gapA',
@@ -334,6 +350,7 @@ test('insertChorusSeparators stops extending the top separator after 5 attempts 
     'F3',
     'F2',
     'F1',
+    CHORUS_SEPARATOR,
     'F0',
     'TOP',
     'gapC',
@@ -351,6 +368,136 @@ test('insertChorusSeparators stops extending the top separator after 5 attempts 
     'gapE',
     'BOT',
   ]);
+});
+
+test('insertChorusSeparators adds a separator above every occurrence of a repeated line pair with no nearby separator', () => {
+  // OUTER1/OUTER2 repeat 3 times and win the top/bottom roles, producing their
+  // own separators. PAIRA/PAIRB is a *different* pair of lines that only
+  // repeats twice as a unit, so it never competes for those roles - the main
+  // algorithm leaves it untouched. Both occurrences sit far (5 filler lines)
+  // from the nearest separator in either direction, so the final pass should
+  // add one above each occurrence's top line.
+  const lines = [
+    'OUTER1', 'OUTER2',
+    'v1', 'v2',
+    'OUTER1', 'OUTER2',
+    'v3', 'v4',
+    'OUTER1', 'OUTER2',
+    'f1', 'f2', 'f3', 'f4', 'f5',
+    'PAIRA', 'PAIRB',
+    'g1', 'g2', 'g3', 'g4', 'g5',
+    'PAIRA', 'PAIRB',
+    'tail',
+  ];
+  const result = insertChorusSeparators(lines);
+  assert.deepEqual(result, [
+    'OUTER1', 'OUTER2',
+    CHORUS_SEPARATOR,
+    'v1', 'v2',
+    CHORUS_SEPARATOR,
+    'OUTER1', 'OUTER2',
+    CHORUS_SEPARATOR,
+    'v3', 'v4',
+    CHORUS_SEPARATOR,
+    'OUTER1', 'OUTER2',
+    CHORUS_SEPARATOR,
+    'f1', 'f2', 'f3', 'f4', 'f5',
+    CHORUS_SEPARATOR,
+    'PAIRA', 'PAIRB',
+    'g1', 'g2', 'g3', 'g4', 'g5',
+    CHORUS_SEPARATOR,
+    'PAIRA', 'PAIRB',
+    'tail',
+  ]);
+});
+
+test('insertChorusSeparators only separates the topmost pair in a run of cascading repeated pairs, not every pair in the chain', () => {
+  // C1-C4 repeat as a block twice, so every adjacent pair within it
+  // (C1/C2, C2/C3, C3/C4) independently qualifies as a "repeated pair".
+  // Without chaining, each would get its own separator, splitting the
+  // block into four single-line pieces. With chaining, only the topmost
+  // pair (C1/C2) gets a separator - it then sits within 4 lines above
+  // C2/C3 and C3/C4, suppressing them, so the block stays intact.
+  const lines = [
+    'OUTER1', 'OUTER2',
+    'v1', 'v2',
+    'OUTER1', 'OUTER2',
+    'v3', 'v4',
+    'OUTER1', 'OUTER2',
+    'f1', 'f2', 'f3', 'f4', 'f5',
+    'C1', 'C2', 'C3', 'C4',
+    'g1', 'g2', 'g3', 'g4', 'g5',
+    'C1', 'C2', 'C3', 'C4',
+    'tail',
+  ];
+  const result = insertChorusSeparators(lines);
+  assert.deepEqual(result, [
+    'OUTER1', 'OUTER2',
+    CHORUS_SEPARATOR,
+    'v1', 'v2',
+    CHORUS_SEPARATOR,
+    'OUTER1', 'OUTER2',
+    CHORUS_SEPARATOR,
+    'v3', 'v4',
+    CHORUS_SEPARATOR,
+    'OUTER1', 'OUTER2',
+    CHORUS_SEPARATOR,
+    'f1', 'f2', 'f3', 'f4', 'f5',
+    CHORUS_SEPARATOR,
+    'C1', 'C2', 'C3', 'C4',
+    'g1', 'g2', 'g3', 'g4', 'g5',
+    CHORUS_SEPARATOR,
+    'C1', 'C2', 'C3', 'C4',
+    'tail',
+  ]);
+});
+
+test('insertChorusSeparators does not add a separator above a pair occurrence with a separator within 4 lines above it, but still adds one above a far-away occurrence of the same pair', () => {
+  // The 1st PAIRA/PAIRB occurrence only has 2 filler lines (x1, x2) before it,
+  // so the OUTER2 separator lands within its 4-line "above" window and it's
+  // suppressed - no separator is inserted for it. The 2nd occurrence is far
+  // (5 filler lines) from every separator, including where the 1st
+  // occurrence's separator would have gone had it not been suppressed, so
+  // it still gets its own separator.
+  const lines = [
+    'OUTER1', 'OUTER2',
+    'v1', 'v2',
+    'OUTER1', 'OUTER2',
+    'v3', 'v4',
+    'OUTER1', 'OUTER2',
+    'x1', 'x2',
+    'PAIRA', 'PAIRB',
+    'g1', 'g2', 'g3', 'g4', 'g5',
+    'PAIRA', 'PAIRB',
+    'tail',
+  ];
+  const result = insertChorusSeparators(lines);
+  assert.deepEqual(result, [
+    'OUTER1', 'OUTER2',
+    CHORUS_SEPARATOR,
+    'v1', 'v2',
+    CHORUS_SEPARATOR,
+    'OUTER1', 'OUTER2',
+    CHORUS_SEPARATOR,
+    'v3', 'v4',
+    CHORUS_SEPARATOR,
+    'OUTER1', 'OUTER2',
+    CHORUS_SEPARATOR,
+    'x1', 'x2',
+    'PAIRA', 'PAIRB',
+    'g1', 'g2', 'g3', 'g4', 'g5',
+    CHORUS_SEPARATOR,
+    'PAIRA', 'PAIRB',
+    'tail',
+  ]);
+});
+
+test('insertChorusSeparators does not add a separator when a repeated line pair only occurs once', () => {
+  // PAIRA/PAIRB only appears once, so it does not meet the "at least two
+  // instances of the pair" threshold and is left untouched, even though it
+  // sits far from any separator.
+  const lines = ['f1', 'f2', 'f3', 'f4', 'f5', 'PAIRA', 'PAIRB', 'g1', 'g2', 'g3', 'g4', 'g5'];
+  assert.deepEqual(insertChorusSeparators(lines), lines);
 });
 
 test('insertChorusSeparators collapses adjacent separators into one', () => {
