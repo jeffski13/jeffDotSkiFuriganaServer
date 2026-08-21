@@ -411,14 +411,54 @@ test('insertChorusSeparators adds a separator above every occurrence of a repeat
   ]);
 });
 
+test('insertChorusSeparators only separates the topmost pair in a run of cascading repeated pairs, not every pair in the chain', () => {
+  // C1-C4 repeat as a block twice, so every adjacent pair within it
+  // (C1/C2, C2/C3, C3/C4) independently qualifies as a "repeated pair".
+  // Without chaining, each would get its own separator, splitting the
+  // block into four single-line pieces. With chaining, only the topmost
+  // pair (C1/C2) gets a separator - it then sits within 4 lines above
+  // C2/C3 and C3/C4, suppressing them, so the block stays intact.
+  const lines = [
+    'OUTER1', 'OUTER2',
+    'v1', 'v2',
+    'OUTER1', 'OUTER2',
+    'v3', 'v4',
+    'OUTER1', 'OUTER2',
+    'f1', 'f2', 'f3', 'f4', 'f5',
+    'C1', 'C2', 'C3', 'C4',
+    'g1', 'g2', 'g3', 'g4', 'g5',
+    'C1', 'C2', 'C3', 'C4',
+    'tail',
+  ];
+  const result = insertChorusSeparators(lines);
+  assert.deepEqual(result, [
+    'OUTER1', 'OUTER2',
+    CHORUS_SEPARATOR,
+    'v1', 'v2',
+    CHORUS_SEPARATOR,
+    'OUTER1', 'OUTER2',
+    CHORUS_SEPARATOR,
+    'v3', 'v4',
+    CHORUS_SEPARATOR,
+    'OUTER1', 'OUTER2',
+    CHORUS_SEPARATOR,
+    'f1', 'f2', 'f3', 'f4', 'f5',
+    CHORUS_SEPARATOR,
+    'C1', 'C2', 'C3', 'C4',
+    'g1', 'g2', 'g3', 'g4', 'g5',
+    CHORUS_SEPARATOR,
+    'C1', 'C2', 'C3', 'C4',
+    'tail',
+  ]);
+});
+
 test('insertChorusSeparators does not add a separator above a pair occurrence with a separator within 4 lines above it, but still adds one above a far-away occurrence of the same pair', () => {
   // The 1st PAIRA/PAIRB occurrence only has 2 filler lines (x1, x2) before it,
   // so the OUTER2 separator lands within its 4-line "above" window and it's
-  // suppressed. The 2nd occurrence is far (5 filler lines) from every
-  // separator - including the one that would otherwise be added above the
-  // 1st occurrence, since eligibility is checked once against the
-  // pre-insertion output, not chained across occurrences - so it still gets
-  // its own separator.
+  // suppressed - no separator is inserted for it. The 2nd occurrence is far
+  // (5 filler lines) from every separator, including where the 1st
+  // occurrence's separator would have gone had it not been suppressed, so
+  // it still gets its own separator.
   const lines = [
     'OUTER1', 'OUTER2',
     'v1', 'v2',
