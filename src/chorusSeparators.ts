@@ -7,6 +7,10 @@ const MAX_BOUNDARY_EXTENSIONS = 5;
 
 type Token = { kind: 'line'; text: string } | { kind: 'sep'; type: 'top' | 'bottom' };
 
+// Lines are compared for similarity with all whitespace stripped out, so two
+// lines that differ only in spacing are still treated as the same line.
+const normalizeForComparison = (line: string): string => line.replace(/\s+/g, '');
+
 // True if the same non-blank value appears at least twice in values.
 const hasRepeatedLine = (values: string[]): boolean => {
   const seen = new Set<string>();
@@ -14,10 +18,11 @@ const hasRepeatedLine = (values: string[]): boolean => {
     if (value.trim() === '') {
       continue;
     }
-    if (seen.has(value)) {
+    const key = normalizeForComparison(value);
+    if (seen.has(key)) {
       return true;
     }
-    seen.add(value);
+    seen.add(key);
   }
   return false;
 };
@@ -61,6 +66,25 @@ const hasRepeatedLine = (values: string[]): boolean => {
  * Finally, any run of adjacent separators (e.g. a bottom separator
  * immediately followed by a top separator with no line between them) is
  * collapsed down to a single separator.
+ *
+ * After all of the above, a last pass looks for any two consecutive lines
+ * (ignoring blank lines) whose ordered pair - this line followed by the
+ * next - appears at least twice somewhere in the song. Occurrences are
+ * scanned top to bottom; for each one, if no separator already appears
+ * within the 4 lines above the top line of the pair, and no separator
+ * already appears within the 2 lines below the bottom line of the pair, a
+ * separator is inserted above the top line - and that insertion is applied
+ * immediately, before the next occurrence is checked. This means a
+ * separator placed above one occurrence counts toward the "4 lines above"
+ * check for the next: when a run of pairs cascades (e.g. line B is the
+ * bottom of one repeated pair and the top of the next), only the topmost
+ * pair in the run gets a separator, which then suppresses the pairs
+ * directly beneath it until the 4-above/2-below window clears again. This
+ * pass runs once, against the fully-processed output of everything above.
+ *
+ * Throughout, lines are compared for similarity with all whitespace
+ * stripped out, so two lines that differ only in spacing are treated as
+ * the same line - the original spacing is preserved in the output.
  */
 export const insertChorusSeparators = (lines: string[]): string[] => {
   const counts = new Map<string, number>();
@@ -71,11 +95,12 @@ export const insertChorusSeparators = (lines: string[]): string[] => {
     if (line.trim() === '') {
       return;
     }
-    counts.set(line, (counts.get(line) ?? 0) + 1);
-    if (!firstIndex.has(line)) {
-      firstIndex.set(line, index);
+    const key = normalizeForComparison(line);
+    counts.set(key, (counts.get(key) ?? 0) + 1);
+    if (!firstIndex.has(key)) {
+      firstIndex.set(key, index);
     }
-    lastIndex.set(line, index);
+    lastIndex.set(key, index);
   });
 
   let bottomWinner: string | undefined;
@@ -122,10 +147,11 @@ export const insertChorusSeparators = (lines: string[]): string[] => {
   let topBoundaryIndexes: number[] = [];
   let bottomBoundaryIndexes: number[] = [];
   lines.forEach((line, index) => {
-    if (line === topWinner) {
+    const key = normalizeForComparison(line);
+    if (key === topWinner) {
       topBoundaryIndexes.push(index);
     }
-    if (line === bottomWinner) {
+    if (key === bottomWinner) {
       bottomBoundaryIndexes.push(index);
     }
   });
@@ -185,7 +211,8 @@ export const insertChorusSeparators = (lines: string[]): string[] => {
   }
 
   if (instances.length === 0) {
-    return trimBoundarySeparators(collapseAdjacentSeparators(tokens.map((token) => (token.kind === 'sep' ? CHORUS_SEPARATOR : token.text))));
+    const withoutExtraSplits = trimBoundarySeparators(collapseAdjacentSeparators(tokens.map((token) => (token.kind === 'sep' ? CHORUS_SEPARATOR : token.text))));
+    return insertSeparatorsForRepeatedLinePairs(withoutExtraSplits);
   }
 
   const smallestNumOfLines = Math.min(...instances.map((instance) => instance.gapLines));
@@ -214,7 +241,8 @@ export const insertChorusSeparators = (lines: string[]): string[] => {
     }
     result.push(token.kind === 'sep' ? CHORUS_SEPARATOR : token.text);
   });
-  return trimBoundarySeparators(collapseAdjacentSeparators(result));
+  const withoutExtraSplits = trimBoundarySeparators(collapseAdjacentSeparators(result));
+  return insertSeparatorsForRepeatedLinePairs(withoutExtraSplits);
 };
 
 // A separator is never allowed to be the very first or very last element of
@@ -242,4 +270,70 @@ const collapseAdjacentSeparators = (result: string[]): string[] => {
     collapsed.push(line);
   }
   return collapsed;
+};
+
+const REPEATED_PAIR_ABOVE_RANGE = 4;
+const REPEATED_PAIR_BELOW_RANGE = 2;
+
+// Joins a pair of lines into a single key for counting how often that exact
+// ordered pair (top followed by bottom) occurs, ignoring whitespace. Each
+// half is already stripped of whitespace by normalizeForComparison, so a
+// plain space safely delimits the two halves without ambiguity.
+const pairKey = (top: string, bottom: string): string => `${normalizeForComparison(top)} ${normalizeForComparison(bottom)}`;
+
+// Final pass: for every pair of consecutive, non-blank lines whose ordered
+// pair appears at least twice in the song, insert a separator above the top
+// line of each occurrence - unless a separator already sits within the 4
+// lines above the top line of that occurrence, or within the 2 lines below
+// its bottom line. Occurrences are processed in order, top to bottom, and
+// each insertion is applied immediately - so a separator placed above one
+// occurrence is visible to the "4 lines above" check for the next
+// occurrence. This lets a separator above the topmost pair in a run of
+// cascading/overlapping repeated pairs (e.g. line B repeats as both the
+// bottom of one pair and the top of the next) suppress the pairs
+// immediately beneath it, instead of every pair in the run getting its own
+// separator independently.
+const insertSeparatorsForRepeatedLinePairs = (result: string[]): string[] => {
+  const isEligiblePair = (top: string, bottom: string): boolean =>
+    top !== CHORUS_SEPARATOR && bottom !== CHORUS_SEPARATOR && top.trim() !== '' && bottom.trim() !== '';
+
+  const pairCounts = new Map<string, number>();
+  for (let index = 0; index < result.length - 1; index++) {
+    const top = result[index];
+    const bottom = result[index + 1];
+    if (!isEligiblePair(top, bottom)) {
+      continue;
+    }
+    const key = pairKey(top, bottom);
+    pairCounts.set(key, (pairCounts.get(key) ?? 0) + 1);
+  }
+
+  const working = result.slice();
+  let index = 0;
+  let inserted = false;
+  while (index < working.length - 1) {
+    const top = working[index];
+    const bottom = working[index + 1];
+    if (isEligiblePair(top, bottom) && (pairCounts.get(pairKey(top, bottom)) ?? 0) >= 2) {
+      const aboveWindow = working.slice(Math.max(0, index - REPEATED_PAIR_ABOVE_RANGE), index);
+      const belowWindow = working.slice(index + 2, index + 2 + REPEATED_PAIR_BELOW_RANGE);
+
+      if (!aboveWindow.includes(CHORUS_SEPARATOR) && !belowWindow.includes(CHORUS_SEPARATOR)) {
+        working.splice(index, 0, CHORUS_SEPARATOR);
+        inserted = true;
+        if (isNonProductionEnvironment()) {
+          console.log('Repeated line pair marked with a separator:', top, '/', bottom);
+        }
+        index += 2;
+        continue;
+      }
+    }
+    index += 1;
+  }
+
+  if (!inserted) {
+    return result;
+  }
+
+  return trimBoundarySeparators(collapseAdjacentSeparators(working));
 };
