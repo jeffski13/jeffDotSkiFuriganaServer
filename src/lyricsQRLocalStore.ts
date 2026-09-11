@@ -1,8 +1,9 @@
 import { randomUUID } from 'node:crypto';
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
+import lyricsQRDefaults from './lyricsQRDefaults.json' with { type: 'json' };
 
-export const DEFAULT_REDIRECT_URL = 'https://jeff.ski/japanese/practiceLyrics';
+export const DEFAULT_REDIRECT_URL = lyricsQRDefaults.url;
 
 const DEFAULT_FILE_PATH = path.resolve(process.cwd(), 'lyricsQR.local.json');
 
