@@ -1,7 +1,8 @@
 import { getApps, initializeApp } from 'firebase-admin/app';
 import { getFirestore } from 'firebase-admin/firestore';
+import { isNonProductionEnvironment } from './chorusSeparators.ts';
 
-const COLLECTION = 'lyricsQR';
+const COLLECTION = isNonProductionEnvironment() ? 'dev-lyricsQR' : 'lyricsQR';
 const DOCUMENT_ID = 'config';
 
 const getDb = () => {
