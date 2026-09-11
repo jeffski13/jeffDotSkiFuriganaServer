@@ -2,8 +2,9 @@ import { getApps, initializeApp } from 'firebase-admin/app';
 import { getFirestore } from 'firebase-admin/firestore';
 import { isNonProductionEnvironment } from './chorusSeparators.ts';
 
-const COLLECTION = isNonProductionEnvironment() ? 'dev-lyricsQR' : 'lyricsQR';
 const DOCUMENT_ID = 'config';
+
+export const getCollectionName = (): string => (isNonProductionEnvironment() ? 'dev-lyricsQR' : 'lyricsQR');
 
 const getDb = () => {
   if (getApps().length === 0) {
@@ -12,7 +13,7 @@ const getDb = () => {
   return getFirestore();
 };
 
-const getConfigDoc = () => getDb().collection(COLLECTION).doc(DOCUMENT_ID);
+const getConfigDoc = () => getDb().collection(getCollectionName()).doc(DOCUMENT_ID);
 
 export const getRedirectUrl = async (): Promise<string | undefined> => {
   const snapshot = await getConfigDoc().get();
