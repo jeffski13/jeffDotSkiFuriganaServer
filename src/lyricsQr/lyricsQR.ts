@@ -7,6 +7,7 @@ import { loadEnvironmentConfig } from './loadEnv.ts';
 loadEnvironmentConfig();
 
 const DOCUMENT_ID = 'config';
+const DATABASE_ID = 'lyricsqr';
 
 export const getCollectionName = (): string => (isNonProductionEnvironment() ? 'dev-lyricsQR' : 'lyricsQR');
 
@@ -16,7 +17,7 @@ const getDb = () => {
   if (getApps().length === 0) {
     initializeApp();
   }
-  return getFirestore();
+  return getFirestore(DATABASE_ID);
 };
 
 const getConfigDoc = () => getDb().collection(getCollectionName()).doc(DOCUMENT_ID);

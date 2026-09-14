@@ -7,7 +7,7 @@
   "scripts": {
     "start": "node src/server.ts",
     "startNodeServer": "node src/server.ts",
-    "test": "node --experimental-test-module-mocks --test src/**/*.test.ts"
+    "test": "node --experimental-test-module-mocks --test 'src/**/*.test.ts'"
   },
   "author": "",
   "license": "ISC",
