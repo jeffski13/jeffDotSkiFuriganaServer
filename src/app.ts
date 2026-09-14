@@ -1,7 +1,7 @@
 import express, { type Express, type NextFunction, type Request, type Response } from 'express';
 import { convertToFurigana } from './furigana.ts';
 import { insertChorusSeparators } from './chorusSeparators.ts';
-import { getRedirectUrl, isValidUpdateKey, setRedirectUrl } from './lyricsQR.ts';
+import { getRedirectUrl, isValidUpdateKey, setRedirectUrl } from './lyricsQr/lyricsQR.ts';
 import packageJson from '../package.json' with { type: 'json' };
 
 export const app: Express = express();

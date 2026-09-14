@@ -1,6 +1,6 @@
 import { existsSync } from 'node:fs';
 import { loadEnvFile } from 'node:process';
-import { isNonProductionEnvironment } from './chorusSeparators.ts';
+import { isNonProductionEnvironment } from '../chorusSeparators.ts';
 
 let loaded = false;
 

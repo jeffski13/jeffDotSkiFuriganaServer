@@ -17,7 +17,7 @@ mock.module('./lyricsQR.ts', {
   },
 });
 
-const { app } = await import('./app.ts');
+const { app } = await import('../app.ts');
 
 const withServer = async (run: (baseUrl: string) => Promise<void>) => {
   const server = app.listen(0);
