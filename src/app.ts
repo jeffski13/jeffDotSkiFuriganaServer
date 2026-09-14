@@ -1,6 +1,7 @@
 import express, { type Express, type NextFunction, type Request, type Response } from 'express';
 import { convertToFurigana } from './furigana.ts';
 import { insertChorusSeparators } from './chorusSeparators.ts';
+import { getRedirectUrl, isValidUpdateKey, setRedirectUrl } from './lyricsQr/lyricsQR.ts';
 import packageJson from '../package.json' with { type: 'json' };
 
 export const app: Express = express();
@@ -71,4 +72,49 @@ app.post('/chorusSeparators', (req: Request, res: Response) => {
   }
 
   res.json(insertChorusSeparators(lines));
+});
+
+app.use('/lyricsQR', (req: Request, res: Response, next: NextFunction) => {
+  res.header('Access-Control-Allow-Origin', 'https://jeff.ski');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type');
+
+  if (req.method === 'OPTIONS') {
+    res.sendStatus(204);
+    return;
+  }
+
+  next();
+});
+
+app.get('/lyricsQR', async (_req: Request, res: Response) => {
+  try {
+    const url = await getRedirectUrl();
+    res.json({ url: url ?? null });
+  } catch (error) {
+    console.error('Failed to fetch lyrics QR redirect URL:', error);
+    res.status(500).json({ error: 'Failed to fetch redirect URL.' });
+  }
+});
+
+app.post('/lyricsQR', async (req: Request, res: Response) => {
+  const { updateKey, url } = req.body ?? {};
+
+  if (typeof updateKey !== 'string' || typeof url !== 'string') {
+    res.status(400).json({ error: 'Request body must include string fields "updateKey" and "url".' });
+    return;
+  }
+
+  try {
+    if (!(await isValidUpdateKey(updateKey))) {
+      res.sendStatus(403);
+      return;
+    }
+
+    await setRedirectUrl(url);
+    res.sendStatus(204);
+  } catch (error) {
+    console.error('Failed to update lyrics QR redirect URL:', error);
+    res.status(500).json({ error: 'Failed to update redirect URL.' });
+  }
 });

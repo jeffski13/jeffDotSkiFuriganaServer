@@ -32,7 +32,7 @@ else
   npm version patch
 fi
 
-gcloud run deploy jeffdotskifuriganaserver --source . --region=us-east1
+gcloud run deploy jeffdotskifuriganaserver --source . --region=us-east1 --set-env-vars=NODE_ENV=production
 
 echo "commiting tags."
 git push --tags origin main
