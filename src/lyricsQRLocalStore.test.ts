@@ -1,10 +1,11 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { existsSync, readFileSync, rmSync } from 'node:fs';
+import { existsSync, rmSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import {
   DEFAULT_REDIRECT_URL,
+  DEFAULT_UPDATE_KEY,
   getLocalRedirectUrl,
   isValidLocalUpdateKey,
   setLocalRedirectUrl,
@@ -32,22 +33,20 @@ test('getLocalRedirectUrl creates the file with default values when it does not 
   });
 });
 
-test('isValidLocalUpdateKey generates a random updateKey and validates against it', async () => {
+test('isValidLocalUpdateKey seeds the file with the default updateKey and validates against it', async () => {
   await withTempFile((filePath) => {
     assert.equal(isValidLocalUpdateKey('not-the-key', filePath), false);
-    assert.equal(isValidLocalUpdateKey('also-not-the-key', filePath), false);
+    assert.equal(isValidLocalUpdateKey(DEFAULT_UPDATE_KEY, filePath), true);
   });
 });
 
 test('setLocalRedirectUrl persists the new url without changing the updateKey', async () => {
   await withTempFile((filePath) => {
-    // Seed the file and capture the generated updateKey.
     getLocalRedirectUrl(filePath);
-    const updateKey = JSON.parse(readFileSync(filePath, 'utf-8')).updateKey;
 
     setLocalRedirectUrl('https://example.com/new', filePath);
 
     assert.equal(getLocalRedirectUrl(filePath), 'https://example.com/new');
-    assert.equal(isValidLocalUpdateKey(updateKey, filePath), true);
+    assert.equal(isValidLocalUpdateKey(DEFAULT_UPDATE_KEY, filePath), true);
   });
 });

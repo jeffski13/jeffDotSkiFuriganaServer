@@ -1,9 +1,9 @@
-import { randomUUID } from 'node:crypto';
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import lyricsQRDefaults from './lyricsQRDefaults.json' with { type: 'json' };
 
 export const DEFAULT_REDIRECT_URL = lyricsQRDefaults.url;
+export const DEFAULT_UPDATE_KEY = lyricsQRDefaults.updateKey;
 
 const DEFAULT_FILE_PATH = path.resolve(process.cwd(), 'lyricsQR.local.json');
 
@@ -11,7 +11,7 @@ type LyricsQRLocalData = { url: string; updateKey: string };
 
 const readData = (filePath: string): LyricsQRLocalData => {
   if (!existsSync(filePath)) {
-    const defaults: LyricsQRLocalData = { url: DEFAULT_REDIRECT_URL, updateKey: randomUUID() };
+    const defaults: LyricsQRLocalData = { url: DEFAULT_REDIRECT_URL, updateKey: DEFAULT_UPDATE_KEY };
     writeFileSync(filePath, JSON.stringify(defaults, null, 2));
     return defaults;
   }
