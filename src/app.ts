@@ -1,7 +1,7 @@
 import express, { type Express, type NextFunction, type Request, type Response } from 'express';
 import { convertToFurigana } from './furigana/index.ts';
 import { insertChorusSeparators } from './chorusSeparator/index.ts';
-import { getRedirectUrl, isValidUpdateKey, setRedirectUrl } from './lyricsQr/lyricsQR.ts';
+import { getRedirectConfig, isValidUpdateKey, setRedirectUrl } from './lyricsQr/lyricsQR.ts';
 import packageJson from '../package.json' with { type: 'json' };
 
 export const app: Express = express();
@@ -89,8 +89,8 @@ app.use('/lyricsQR', (req: Request, res: Response, next: NextFunction) => {
 
 app.get('/lyricsQR', async (_req: Request, res: Response) => {
   try {
-    const url = await getRedirectUrl();
-    res.json({ url: url ?? null });
+    const { url, version } = await getRedirectConfig();
+    res.json({ url: url ?? null, version });
   } catch (error) {
     console.error('Failed to fetch lyrics QR redirect URL:', error);
     res.status(500).json({ error: 'Failed to fetch redirect URL.' });
