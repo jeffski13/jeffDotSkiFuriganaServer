@@ -1,7 +1,7 @@
 import { getApps, initializeApp } from 'firebase-admin/app';
-import { getFirestore } from 'firebase-admin/firestore';
+import { FieldValue, getFirestore } from 'firebase-admin/firestore';
 import { isNonProductionEnvironment } from '../chorusSeparator/index.ts';
-import { getLocalRedirectUrl, isValidLocalUpdateKey, setLocalRedirectUrl } from './lyricsQRLocalStore.ts';
+import { getLocalRedirectConfig, isValidLocalUpdateKey, setLocalRedirectUrl } from './lyricsQRLocalStore.ts';
 import { loadEnvironmentConfig } from './loadEnv.ts';
 
 loadEnvironmentConfig();
@@ -22,13 +22,16 @@ const getDb = () => {
 
 const getConfigDoc = () => getDb().collection(getCollectionName()).doc(DOCUMENT_ID);
 
-export const getRedirectUrl = async (): Promise<string | undefined> => {
+export type RedirectConfig = { url: string | undefined; version: number };
+
+export const getRedirectConfig = async (): Promise<RedirectConfig> => {
   if (!isFirebaseEnabled()) {
-    return getLocalRedirectUrl();
+    return getLocalRedirectConfig();
   }
 
   const snapshot = await getConfigDoc().get();
-  return snapshot.data()?.url;
+  const data = snapshot.data();
+  return { url: data?.url, version: typeof data?.version === 'number' ? data.version : 0 };
 };
 
 export const isValidUpdateKey = async (updateKey: string): Promise<boolean> => {
@@ -47,5 +50,5 @@ export const setRedirectUrl = async (url: string): Promise<void> => {
     return;
   }
 
-  await getConfigDoc().set({ url }, { merge: true });
+  await getConfigDoc().set({ url, version: FieldValue.increment(1) }, { merge: true });
 };

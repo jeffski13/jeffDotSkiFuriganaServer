@@ -5,14 +5,16 @@ import type { AddressInfo } from 'node:net';
 const state = {
   url: 'https://example.com/original',
   updateKey: 'correct-key',
+  version: 3,
 };
 
 mock.module('./lyricsQR.ts', {
   namedExports: {
-    getRedirectUrl: async () => state.url,
+    getRedirectConfig: async () => ({ url: state.url, version: state.version }),
     isValidUpdateKey: async (key: string) => key === state.updateKey,
     setRedirectUrl: async (url: string) => {
       state.url = url;
+      state.version += 1;
     },
   },
 });
@@ -29,13 +31,14 @@ const withServer = async (run: (baseUrl: string) => Promise<void>) => {
   }
 };
 
-test('GET /lyricsQR returns the current redirect url', async () => {
+test('GET /lyricsQR returns the current redirect url and version', async () => {
   await withServer(async (baseUrl) => {
     const response = await fetch(`${baseUrl}/lyricsQR`);
 
     assert.equal(response.status, 200);
     const body = await response.json();
     assert.equal(body.url, 'https://example.com/original');
+    assert.equal(body.version, 3);
   });
 });
 
@@ -60,10 +63,14 @@ test('POST /lyricsQR returns 403 when the updateKey is incorrect', async () => {
     });
 
     assert.equal(response.status, 403);
+
+    const getResponse = await fetch(`${baseUrl}/lyricsQR`);
+    const body = await getResponse.json();
+    assert.equal(body.version, 3);
   });
 });
 
-test('POST /lyricsQR updates the redirect url when the updateKey is correct', async () => {
+test('POST /lyricsQR updates the redirect url and increments the version when the updateKey is correct', async () => {
   await withServer(async (baseUrl) => {
     const response = await fetch(`${baseUrl}/lyricsQR`, {
       method: 'POST',
@@ -76,5 +83,6 @@ test('POST /lyricsQR updates the redirect url when the updateKey is correct', as
     const getResponse = await fetch(`${baseUrl}/lyricsQR`);
     const body = await getResponse.json();
     assert.equal(body.url, 'https://example.com/new');
+    assert.equal(body.version, 4);
   });
 });

@@ -6,6 +6,8 @@ import path from 'node:path';
 import {
   DEFAULT_REDIRECT_URL,
   DEFAULT_UPDATE_KEY,
+  DEFAULT_VERSION,
+  getLocalRedirectConfig,
   getLocalRedirectUrl,
   isValidLocalUpdateKey,
   setLocalRedirectUrl,
@@ -48,5 +50,24 @@ test('setLocalRedirectUrl persists the new url without changing the updateKey', 
 
     assert.equal(getLocalRedirectUrl(filePath), 'https://example.com/new');
     assert.equal(isValidLocalUpdateKey(DEFAULT_UPDATE_KEY, filePath), true);
+  });
+});
+
+test('getLocalRedirectConfig seeds the file with the default version', async () => {
+  await withTempFile((filePath) => {
+    assert.deepEqual(getLocalRedirectConfig(filePath), { url: DEFAULT_REDIRECT_URL, version: DEFAULT_VERSION });
+  });
+});
+
+test('setLocalRedirectUrl increments the version on each update', async () => {
+  await withTempFile((filePath) => {
+    setLocalRedirectUrl('https://example.com/first', filePath);
+    assert.equal(getLocalRedirectConfig(filePath).version, DEFAULT_VERSION + 1);
+
+    setLocalRedirectUrl('https://example.com/second', filePath);
+    assert.deepEqual(getLocalRedirectConfig(filePath), {
+      url: 'https://example.com/second',
+      version: DEFAULT_VERSION + 2,
+    });
   });
 });
