@@ -1,6 +1,6 @@
 import { getApps, initializeApp } from 'firebase-admin/app';
 import { getFirestore } from 'firebase-admin/firestore';
-import { isNonProductionEnvironment } from '../chorusSeparators.ts';
+import { isNonProductionEnvironment } from '../chorusSeparator/index.ts';
 import { getLocalRedirectUrl, isValidLocalUpdateKey, setLocalRedirectUrl } from './lyricsQRLocalStore.ts';
 import { loadEnvironmentConfig } from './loadEnv.ts';
 

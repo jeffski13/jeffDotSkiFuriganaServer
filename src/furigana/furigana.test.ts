@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { applyAmbiguousKanjiOverrides } from './furigana.ts';
+import { applyAmbiguousKanjiOverrides } from './index.ts';
 
 test('applyAmbiguousKanjiOverrides replaces the reading with the most common one', () => {
   const result = applyAmbiguousKanjiOverrides('道標を見つけた', '道標（どうひょう）を見つけた');

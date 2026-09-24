@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { CHORUS_SEPARATOR, insertChorusSeparators, isNonProductionEnvironment } from './chorusSeparators.ts';
+import { CHORUS_SEPARATOR, insertChorusSeparators, isNonProductionEnvironment } from './index.ts';
 
 test('isNonProductionEnvironment returns false when NODE_ENV is production', () => {
   const original = process.env.NODE_ENV;
