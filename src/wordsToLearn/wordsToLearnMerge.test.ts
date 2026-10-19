@@ -17,6 +17,12 @@ test('isWord accepts a valid word', () => {
   assert.equal(isWord(word()), true);
 });
 
+test('isWord accepts every word list', () => {
+  for (const list of ['learning', 'wantToLearn', 'culture']) {
+    assert.equal(isWord({ ...word(), list }), true);
+  }
+});
+
 test('isWord rejects missing fields, unknown lists, and non-finite numbers', () => {
   assert.equal(isWord(null), false);
   assert.equal(isWord({ ...word(), id: '' }), false);

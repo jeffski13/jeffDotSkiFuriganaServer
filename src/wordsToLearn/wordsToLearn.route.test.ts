@@ -16,8 +16,12 @@ const word = (overrides: Partial<Word> = {}): Word => ({
 
 const state: { words: Word[]; failNext: boolean } = { words: [word()], failNext: false };
 
+const UPDATE_KEY = 'correct-key';
+const LYRICS_QR_UPDATE_KEY = 'lyrics-qr-key';
+
 mock.module('./wordsToLearn.ts', {
   namedExports: {
+    isValidUpdateKey: async (key: string) => key === UPDATE_KEY,
     getWords: async () => {
       if (state.failNext) {
         state.failNext = false;
@@ -32,12 +36,10 @@ mock.module('./wordsToLearn.ts', {
   },
 });
 
-const UPDATE_KEY = 'correct-key';
-
 mock.module('../lyricsQr/lyricsQR.ts', {
   namedExports: {
     getRedirectConfig: async () => ({ url: undefined, version: 0 }),
-    isValidUpdateKey: async (key: string) => key === UPDATE_KEY,
+    isValidUpdateKey: async (key: string) => key === LYRICS_QR_UPDATE_KEY,
     setRedirectUrl: async () => {},
   },
 });
@@ -97,6 +99,16 @@ test('POST /wordsToLearn returns 403 and changes nothing when the updateKey is i
   await withServer(async (baseUrl) => {
     const before = state.words;
     const response = await post(baseUrl, { words: [word({ id: 'z', lastModified: 999 })] }, 'wrong-key');
+
+    assert.equal(response.status, 403);
+    assert.equal(state.words, before);
+  });
+});
+
+test('POST /wordsToLearn rejects the lyricsQR update key', async () => {
+  await withServer(async (baseUrl) => {
+    const before = state.words;
+    const response = await post(baseUrl, { words: [word({ id: 'z', lastModified: 999 })] }, LYRICS_QR_UPDATE_KEY);
 
     assert.equal(response.status, 403);
     assert.equal(state.words, before);

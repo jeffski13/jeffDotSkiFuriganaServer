@@ -2,7 +2,11 @@ import express, { type Express, type NextFunction, type Request, type Response }
 import { convertToFurigana } from './furigana/index.ts';
 import { insertChorusSeparators } from './chorusSeparator/index.ts';
 import { getRedirectConfig, isValidUpdateKey, setRedirectUrl } from './lyricsQr/lyricsQR.ts';
-import { getWords, mergeIncomingWords } from './wordsToLearn/wordsToLearn.ts';
+import {
+  getWords,
+  isValidUpdateKey as isValidWordsToLearnUpdateKey,
+  mergeIncomingWords,
+} from './wordsToLearn/wordsToLearn.ts';
 import { isWord } from './wordsToLearn/wordsToLearnMerge.ts';
 import packageJson from '../package.json' with { type: 'json' };
 
@@ -144,8 +148,8 @@ app.get('/wordsToLearn', async (_req: Request, res: Response) => {
 });
 
 // Body: { updateKey: string, words: Word[] } — the words changed on the client since its
-// last sync. Uses the same update key as /lyricsQR. Responds with the full merged list
-// (tombstoned deletions included).
+// last sync. The update key is stored in the wordsToLearn collection's config document.
+// Responds with the full merged list (tombstoned deletions included).
 app.post('/wordsToLearn', async (req: Request, res: Response) => {
   const updateKey: unknown = req.body?.updateKey;
   const words: unknown = req.body?.words;
@@ -156,7 +160,7 @@ app.post('/wordsToLearn', async (req: Request, res: Response) => {
   }
 
   try {
-    if (!(await isValidUpdateKey(updateKey))) {
+    if (!(await isValidWordsToLearnUpdateKey(updateKey))) {
       res.sendStatus(403);
       return;
     }

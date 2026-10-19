@@ -1,9 +1,9 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { existsSync, rmSync } from 'node:fs';
+import { existsSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { DEFAULT_WORDS, getLocalWords, mergeLocalWords } from './wordsToLearnLocalStore.ts';
+import { DEFAULT_WORDS, getLocalWords, isValidLocalUpdateKey, mergeLocalWords } from './wordsToLearnLocalStore.ts';
 import { isWord } from './wordsToLearnMerge.ts';
 
 const withTempFile = async (run: (filePath: string) => Promise<void> | void) => {
@@ -55,5 +55,33 @@ test('mergeLocalWords ignores an edit older than the stored copy', async () => {
     mergeLocalWords([{ ...first, english: 'older', lastModified: 400 }], filePath);
 
     assert.equal(getLocalWords(filePath).find((w) => w.id === first.id)?.english, 'newer');
+  });
+});
+
+test('isValidLocalUpdateKey rejects every key when the file has no updateKey', async () => {
+  await withTempFile((filePath) => {
+    assert.equal(isValidLocalUpdateKey('anything', filePath), false);
+    assert.equal(isValidLocalUpdateKey('', filePath), false);
+  });
+});
+
+test('isValidLocalUpdateKey validates against the updateKey stored in the file', async () => {
+  await withTempFile((filePath) => {
+    writeFileSync(filePath, JSON.stringify({ updateKey: 'local-key', words: DEFAULT_WORDS }));
+
+    assert.equal(isValidLocalUpdateKey('local-key', filePath), true);
+    assert.equal(isValidLocalUpdateKey('wrong-key', filePath), false);
+  });
+});
+
+test('mergeLocalWords keeps the updateKey when it rewrites the file', async () => {
+  await withTempFile((filePath) => {
+    writeFileSync(filePath, JSON.stringify({ updateKey: 'local-key', words: DEFAULT_WORDS }));
+    const [first] = DEFAULT_WORDS;
+
+    mergeLocalWords([{ ...first, english: 'edited', lastModified: 500 }], filePath);
+
+    assert.equal(JSON.parse(readFileSync(filePath, 'utf-8')).updateKey, 'local-key');
+    assert.equal(isValidLocalUpdateKey('local-key', filePath), true);
   });
 });

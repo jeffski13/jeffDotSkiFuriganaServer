@@ -1,4 +1,4 @@
-export const WORD_LISTS = ['learning', 'wantToLearn'] as const;
+export const WORD_LISTS = ['learning', 'wantToLearn', 'culture'] as const;
 export type WordList = (typeof WORD_LISTS)[number];
 
 // Deletions are kept as tombstones (deleted: true) so that a delete made on one
