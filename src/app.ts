@@ -2,6 +2,8 @@ import express, { type Express, type NextFunction, type Request, type Response }
 import { convertToFurigana } from './furigana/index.ts';
 import { insertChorusSeparators } from './chorusSeparator/index.ts';
 import { getRedirectConfig, isValidUpdateKey, setRedirectUrl } from './lyricsQr/lyricsQR.ts';
+import { getWords, mergeIncomingWords } from './wordsToLearn/wordsToLearn.ts';
+import { isWord } from './wordsToLearn/wordsToLearnMerge.ts';
 import packageJson from '../package.json' with { type: 'json' };
 
 export const app: Express = express();
@@ -116,5 +118,52 @@ app.post('/lyricsQR', async (req: Request, res: Response) => {
   } catch (error) {
     console.error('Failed to update lyrics QR redirect URL:', error);
     res.status(500).json({ error: 'Failed to update redirect URL.' });
+  }
+});
+
+app.use('/wordsToLearn', (req: Request, res: Response, next: NextFunction) => {
+  res.header('Access-Control-Allow-Origin', 'https://jeff.ski');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type');
+
+  if (req.method === 'OPTIONS') {
+    res.sendStatus(204);
+    return;
+  }
+
+  next();
+});
+
+app.get('/wordsToLearn', async (_req: Request, res: Response) => {
+  try {
+    res.json({ words: await getWords() });
+  } catch (error) {
+    console.error('Failed to fetch words to learn:', error);
+    res.status(500).json({ error: 'Failed to fetch words.' });
+  }
+});
+
+// Body: { updateKey: string, words: Word[] } — the words changed on the client since its
+// last sync. Uses the same update key as /lyricsQR. Responds with the full merged list
+// (tombstoned deletions included).
+app.post('/wordsToLearn', async (req: Request, res: Response) => {
+  const updateKey: unknown = req.body?.updateKey;
+  const words: unknown = req.body?.words;
+
+  if (typeof updateKey !== 'string' || !Array.isArray(words) || !words.every(isWord)) {
+    res.status(400).json({ error: 'Request body must include a string "updateKey" and a "words" array of valid words.' });
+    return;
+  }
+
+  try {
+    if (!(await isValidUpdateKey(updateKey))) {
+      res.sendStatus(403);
+      return;
+    }
+
+    res.json({ words: await mergeIncomingWords(words) });
+  } catch (error) {
+    console.error('Failed to update words to learn:', error);
+    res.status(500).json({ error: 'Failed to update words.' });
   }
 });
