@@ -1,0 +1,769 @@
+{
+  "words": [
+    {
+      "id": "seed-learning-001",
+      "romaji": "futsuka yoi",
+      "english": "hangover",
+      "list": "learning",
+      "order": 0,
+      "lastModified": 1,
+      "deleted": false
+    },
+    {
+      "id": "seed-learning-002",
+      "romaji": "katsudou",
+      "english": "actvity",
+      "list": "learning",
+      "order": 1,
+      "lastModified": 1,
+      "deleted": false
+    },
+    {
+      "id": "seed-learning-003",
+      "romaji": "shouhin",
+      "english": "stuff",
+      "list": "learning",
+      "order": 2,
+      "lastModified": 1,
+      "deleted": false
+    },
+    {
+      "id": "seed-want-001",
+      "romaji": "Suisoku desu",
+      "english": "this is just a guess",
+      "list": "wantToLearn",
+      "order": 0,
+      "lastModified": 1,
+      "deleted": false
+    },
+    {
+      "id": "seed-want-002",
+      "romaji": "kaisoku",
+      "english": "rapid",
+      "list": "wantToLearn",
+      "order": 1,
+      "lastModified": 1,
+      "deleted": false
+    },
+    {
+      "id": "seed-want-003",
+      "romaji": "Kakutei",
+      "english": "local",
+      "list": "wantToLearn",
+      "order": 2,
+      "lastModified": 1,
+      "deleted": false
+    },
+    {
+      "id": "seed-want-004",
+      "romaji": "konoaida",
+      "english": "the other day",
+      "list": "wantToLearn",
+      "order": 3,
+      "lastModified": 1,
+      "deleted": false
+    },
+    {
+      "id": "seed-want-005",
+      "romaji": "Opai",
+      "english": "breasts",
+      "list": "wantToLearn",
+      "order": 4,
+      "lastModified": 1,
+      "deleted": false
+    },
+    {
+      "id": "seed-want-006",
+      "romaji": "ikinokoru",
+      "english": "survive",
+      "list": "wantToLearn",
+      "order": 5,
+      "lastModified": 1,
+      "deleted": false
+    },
+    {
+      "id": "seed-want-007",
+      "romaji": "uraiyamashi",
+      "english": "jealous",
+      "list": "wantToLearn",
+      "order": 6,
+      "lastModified": 1,
+      "deleted": false
+    },
+    {
+      "id": "seed-want-008",
+      "romaji": "shurui",
+      "english": "type",
+      "list": "wantToLearn",
+      "order": 7,
+      "lastModified": 1,
+      "deleted": false
+    },
+    {
+      "id": "seed-want-009",
+      "romaji": "Yoku kangaete miru to",
+      "english": "on second thought",
+      "list": "wantToLearn",
+      "order": 8,
+      "lastModified": 1,
+      "deleted": false
+    },
+    {
+      "id": "seed-want-010",
+      "romaji": "kyoudai",
+      "english": "siblings",
+      "list": "wantToLearn",
+      "order": 9,
+      "lastModified": 1,
+      "deleted": false
+    },
+    {
+      "id": "seed-want-011",
+      "romaji": "toku ni",
+      "english": "especially",
+      "list": "wantToLearn",
+      "order": 10,
+      "lastModified": 1,
+      "deleted": false
+    },
+    {
+      "id": "seed-want-012",
+      "romaji": "Kappa San",
+      "english": "green ghost monster that lives in io jima island",
+      "list": "wantToLearn",
+      "order": 11,
+      "lastModified": 1,
+      "deleted": false
+    },
+    {
+      "id": "seed-want-013",
+      "romaji": "kinchou suru",
+      "english": "nervous",
+      "list": "wantToLearn",
+      "order": 12,
+      "lastModified": 1,
+      "deleted": false
+    },
+    {
+      "id": "seed-want-014",
+      "romaji": "moshikatara",
+      "english": "maybe",
+      "list": "wantToLearn",
+      "order": 13,
+      "lastModified": 1,
+      "deleted": false
+    },
+    {
+      "id": "seed-want-015",
+      "romaji": "yatto hanakin da yo",
+      "english": "TGIF thank god its friday",
+      "list": "wantToLearn",
+      "order": 14,
+      "lastModified": 1,
+      "deleted": false
+    },
+    {
+      "id": "seed-want-016",
+      "romaji": "seikaku",
+      "english": "personality",
+      "list": "wantToLearn",
+      "order": 15,
+      "lastModified": 1,
+      "deleted": false
+    },
+    {
+      "id": "seed-want-017",
+      "romaji": "Akiraka ni",
+      "english": "obviously",
+      "list": "wantToLearn",
+      "order": 16,
+      "lastModified": 1,
+      "deleted": false
+    },
+    {
+      "id": "seed-want-018",
+      "romaji": "saiwai na koto ni",
+      "english": "fortunately",
+      "list": "wantToLearn",
+      "order": 17,
+      "lastModified": 1,
+      "deleted": false
+    },
+    {
+      "id": "seed-want-019",
+      "romaji": "zannen nagara",
+      "english": "unfortunately",
+      "list": "wantToLearn",
+      "order": 18,
+      "lastModified": 1,
+      "deleted": false
+    },
+    {
+      "id": "seed-want-020",
+      "romaji": "otearai",
+      "english": "restroom",
+      "list": "wantToLearn",
+      "order": 19,
+      "lastModified": 1,
+      "deleted": false
+    },
+    {
+      "id": "seed-want-021",
+      "romaji": "Hyougen",
+      "english": "expression",
+      "list": "wantToLearn",
+      "order": 20,
+      "lastModified": 1,
+      "deleted": false
+    },
+    {
+      "id": "seed-want-022",
+      "romaji": "tsukeru",
+      "english": "add",
+      "list": "wantToLearn",
+      "order": 21,
+      "lastModified": 1,
+      "deleted": false
+    },
+    {
+      "id": "seed-want-023",
+      "romaji": "kankyou ni warui desu",
+      "english": "bad for the environment",
+      "list": "wantToLearn",
+      "order": 22,
+      "lastModified": 1,
+      "deleted": false
+    },
+    {
+      "id": "seed-want-024",
+      "romaji": "Iranai",
+      "english": "unnecessary(strong)",
+      "list": "wantToLearn",
+      "order": 23,
+      "lastModified": 1,
+      "deleted": false
+    },
+    {
+      "id": "seed-want-025",
+      "romaji": "Kochirakoso",
+      "english": "no, thank you!",
+      "list": "wantToLearn",
+      "order": 24,
+      "lastModified": 1,
+      "deleted": false
+    },
+    {
+      "id": "seed-want-026",
+      "romaji": "modoru",
+      "english": "return to a place, come back",
+      "list": "wantToLearn",
+      "order": 25,
+      "lastModified": 1,
+      "deleted": false
+    },
+    {
+      "id": "seed-want-027",
+      "romaji": "tanki",
+      "english": "short term",
+      "list": "wantToLearn",
+      "order": 26,
+      "lastModified": 1,
+      "deleted": false
+    },
+    {
+      "id": "seed-want-028",
+      "romaji": "chouki",
+      "english": "long term",
+      "list": "wantToLearn",
+      "order": 27,
+      "lastModified": 1,
+      "deleted": false
+    },
+    {
+      "id": "seed-want-029",
+      "romaji": "koishii",
+      "english": "i miss",
+      "list": "wantToLearn",
+      "order": 28,
+      "lastModified": 1,
+      "deleted": false
+    },
+    {
+      "id": "seed-want-030",
+      "romaji": "tokutei no",
+      "english": "specific",
+      "list": "wantToLearn",
+      "order": 29,
+      "lastModified": 1,
+      "deleted": false
+    },
+    {
+      "id": "seed-want-031",
+      "romaji": "shokubutsu",
+      "english": "plant",
+      "list": "wantToLearn",
+      "order": 30,
+      "lastModified": 1,
+      "deleted": false
+    },
+    {
+      "id": "seed-want-032",
+      "romaji": "sentaku",
+      "english": "option",
+      "list": "wantToLearn",
+      "order": 31,
+      "lastModified": 1,
+      "deleted": false
+    },
+    {
+      "id": "seed-want-033",
+      "romaji": "tatemono",
+      "english": "building",
+      "list": "wantToLearn",
+      "order": 32,
+      "lastModified": 1,
+      "deleted": false
+    },
+    {
+      "id": "seed-want-034",
+      "romaji": "O machi dou sama deshita",
+      "english": "thank you for waiting.",
+      "list": "wantToLearn",
+      "order": 33,
+      "lastModified": 1,
+      "deleted": false
+    },
+    {
+      "id": "seed-want-035",
+      "romaji": "keikakutekina",
+      "english": "organized",
+      "list": "wantToLearn",
+      "order": 34,
+      "lastModified": 1,
+      "deleted": false
+    },
+    {
+      "id": "seed-want-036",
+      "romaji": "negatte imasu",
+      "english": "i hope so",
+      "list": "wantToLearn",
+      "order": 35,
+      "lastModified": 1,
+      "deleted": false
+    },
+    {
+      "id": "seed-want-037",
+      "romaji": "jihaku",
+      "english": "confession",
+      "list": "wantToLearn",
+      "order": 36,
+      "lastModified": 1,
+      "deleted": false
+    },
+    {
+      "id": "seed-want-038",
+      "romaji": "sonotori",
+      "english": "exactly!",
+      "list": "wantToLearn",
+      "order": 37,
+      "lastModified": 1,
+      "deleted": false
+    },
+    {
+      "id": "seed-want-039",
+      "romaji": "namakemono",
+      "english": "sloth",
+      "list": "wantToLearn",
+      "order": 38,
+      "lastModified": 1,
+      "deleted": false
+    },
+    {
+      "id": "seed-want-040",
+      "romaji": "Ijyou",
+      "english": "more than",
+      "list": "wantToLearn",
+      "order": 39,
+      "lastModified": 1,
+      "deleted": false
+    },
+    {
+      "id": "seed-want-041",
+      "romaji": "Ika",
+      "english": "less than",
+      "list": "wantToLearn",
+      "order": 40,
+      "lastModified": 1,
+      "deleted": false
+    },
+    {
+      "id": "seed-want-042",
+      "romaji": "Omoni",
+      "english": "mainly",
+      "list": "wantToLearn",
+      "order": 41,
+      "lastModified": 1,
+      "deleted": false
+    },
+    {
+      "id": "seed-want-043",
+      "romaji": "reigai",
+      "english": "exception",
+      "list": "wantToLearn",
+      "order": 42,
+      "lastModified": 1,
+      "deleted": false
+    },
+    {
+      "id": "seed-want-044",
+      "romaji": "heikin",
+      "english": "average",
+      "list": "wantToLearn",
+      "order": 43,
+      "lastModified": 1,
+      "deleted": false
+    },
+    {
+      "id": "seed-want-045",
+      "romaji": "sono hoka wa",
+      "english": "anything else?",
+      "list": "wantToLearn",
+      "order": 44,
+      "lastModified": 1,
+      "deleted": false
+    },
+    {
+      "id": "seed-want-046",
+      "romaji": "dono youna",
+      "english": "like what",
+      "list": "wantToLearn",
+      "order": 45,
+      "lastModified": 1,
+      "deleted": false
+    },
+    {
+      "id": "seed-want-047",
+      "romaji": "sore fukumenai de",
+      "english": "doesnt count!",
+      "list": "wantToLearn",
+      "order": 46,
+      "lastModified": 1,
+      "deleted": false
+    },
+    {
+      "id": "seed-want-048",
+      "romaji": "Nante kyoumi bukai nda",
+      "english": "how intruiging",
+      "list": "wantToLearn",
+      "order": 47,
+      "lastModified": 1,
+      "deleted": false
+    },
+    {
+      "id": "seed-want-049",
+      "romaji": "sono tame ni",
+      "english": "por eso, thats why",
+      "list": "wantToLearn",
+      "order": 48,
+      "lastModified": 1,
+      "deleted": false
+    },
+    {
+      "id": "seed-want-050",
+      "romaji": "hanashi o moto ni modoshimashou",
+      "english": "back to what we were talking about",
+      "list": "wantToLearn",
+      "order": 49,
+      "lastModified": 1,
+      "deleted": false
+    },
+    {
+      "id": "seed-want-051",
+      "romaji": "kigachitte imasu",
+      "english": "distracted",
+      "list": "wantToLearn",
+      "order": 50,
+      "lastModified": 1,
+      "deleted": false
+    },
+    {
+      "id": "seed-want-052",
+      "romaji": "kigachiru",
+      "english": "to distract",
+      "list": "wantToLearn",
+      "order": 51,
+      "lastModified": 1,
+      "deleted": false
+    },
+    {
+      "id": "seed-want-053",
+      "romaji": "kidzukimasen deshita",
+      "english": "i didnt notice",
+      "list": "wantToLearn",
+      "order": 52,
+      "lastModified": 1,
+      "deleted": false
+    },
+    {
+      "id": "seed-want-054",
+      "romaji": "Kankeinai",
+      "english": "Nevermind",
+      "list": "wantToLearn",
+      "order": 53,
+      "lastModified": 1,
+      "deleted": false
+    },
+    {
+      "id": "seed-want-055",
+      "romaji": "shoshinsha",
+      "english": "beginner",
+      "list": "wantToLearn",
+      "order": 54,
+      "lastModified": 1,
+      "deleted": false
+    },
+    {
+      "id": "seed-want-056",
+      "romaji": "ippanteki desu",
+      "english": "it is common",
+      "list": "wantToLearn",
+      "order": 55,
+      "lastModified": 1,
+      "deleted": false
+    },
+    {
+      "id": "seed-want-057",
+      "romaji": "kyouyu",
+      "english": "share",
+      "list": "wantToLearn",
+      "order": 56,
+      "lastModified": 1,
+      "deleted": false
+    },
+    {
+      "id": "seed-want-058",
+      "romaji": "rikai",
+      "english": "comprehension",
+      "list": "wantToLearn",
+      "order": 57,
+      "lastModified": 1,
+      "deleted": false
+    },
+    {
+      "id": "seed-want-059",
+      "romaji": "kidzukimashita",
+      "english": "i noticed",
+      "list": "wantToLearn",
+      "order": 58,
+      "lastModified": 1,
+      "deleted": false
+    },
+    {
+      "id": "seed-want-060",
+      "romaji": "mayou",
+      "english": "confusing",
+      "list": "wantToLearn",
+      "order": 59,
+      "lastModified": 1,
+      "deleted": false
+    },
+    {
+      "id": "seed-want-061",
+      "romaji": "nagai aida",
+      "english": "long term",
+      "list": "wantToLearn",
+      "order": 60,
+      "lastModified": 1,
+      "deleted": false
+    },
+    {
+      "id": "seed-want-062",
+      "romaji": "soo datto omou",
+      "english": "i am guessing",
+      "list": "wantToLearn",
+      "order": 61,
+      "lastModified": 1,
+      "deleted": false
+    },
+    {
+      "id": "seed-want-063",
+      "romaji": "naru hodo",
+      "english": "makes sense? i see",
+      "list": "wantToLearn",
+      "order": 62,
+      "lastModified": 1,
+      "deleted": false
+    },
+    {
+      "id": "seed-want-064",
+      "romaji": "ippai",
+      "english": "a Lonny ñam",
+      "list": "wantToLearn",
+      "order": 63,
+      "lastModified": 1,
+      "deleted": false
+    },
+    {
+      "id": "seed-want-065",
+      "romaji": "suji, kazu",
+      "english": "numbers",
+      "list": "wantToLearn",
+      "order": 64,
+      "lastModified": 1,
+      "deleted": false
+    },
+    {
+      "id": "seed-want-066",
+      "romaji": "shinyuu",
+      "english": "best friend",
+      "list": "wantToLearn",
+      "order": 65,
+      "lastModified": 1,
+      "deleted": false
+    },
+    {
+      "id": "seed-want-067",
+      "romaji": "Soshitara",
+      "english": "so then",
+      "list": "wantToLearn",
+      "order": 66,
+      "lastModified": 1,
+      "deleted": false
+    },
+    {
+      "id": "seed-want-068",
+      "romaji": "shuuchuu suru",
+      "english": "concentrate",
+      "list": "wantToLearn",
+      "order": 67,
+      "lastModified": 1,
+      "deleted": false
+    },
+    {
+      "id": "seed-want-069",
+      "romaji": "nite iru",
+      "english": "similar",
+      "list": "wantToLearn",
+      "order": 68,
+      "lastModified": 1,
+      "deleted": false
+    },
+    {
+      "id": "seed-want-070",
+      "romaji": "odaiji ni",
+      "english": "take care of yourself",
+      "list": "wantToLearn",
+      "order": 69,
+      "lastModified": 1,
+      "deleted": false
+    },
+    {
+      "id": "seed-want-071",
+      "romaji": "narette imasu",
+      "english": "im used to it",
+      "list": "wantToLearn",
+      "order": 70,
+      "lastModified": 1,
+      "deleted": false
+    },
+    {
+      "id": "seed-want-072",
+      "romaji": "Sore yori saa",
+      "english": "anyways",
+      "list": "wantToLearn",
+      "order": 71,
+      "lastModified": 1,
+      "deleted": false
+    },
+    {
+      "id": "seed-want-073",
+      "romaji": "choushi ga yoi/yokunai",
+      "english": "it does/doesnt work",
+      "list": "wantToLearn",
+      "order": 72,
+      "lastModified": 1,
+      "deleted": false
+    },
+    {
+      "id": "seed-want-074",
+      "romaji": "to wa ie",
+      "english": "having said that",
+      "list": "wantToLearn",
+      "order": 73,
+      "lastModified": 1,
+      "deleted": false
+    },
+    {
+      "id": "seed-want-075",
+      "romaji": "kouun o inorimasu",
+      "english": "good luck",
+      "list": "wantToLearn",
+      "order": 74,
+      "lastModified": 1,
+      "deleted": false
+    },
+    {
+      "id": "seed-want-076",
+      "romaji": "sunawachi",
+      "english": "in other words",
+      "list": "wantToLearn",
+      "order": 75,
+      "lastModified": 1,
+      "deleted": false
+    },
+    {
+      "id": "seed-want-077",
+      "romaji": "machi kirenai",
+      "english": "I can’t wait",
+      "list": "wantToLearn",
+      "order": 76,
+      "lastModified": 1,
+      "deleted": false
+    },
+    {
+      "id": "seed-want-078",
+      "romaji": "hayaku konai kanaa",
+      "english": "im looking forward to it",
+      "list": "wantToLearn",
+      "order": 77,
+      "lastModified": 1,
+      "deleted": false
+    },
+    {
+      "id": "seed-want-079",
+      "romaji": "dare mo wakaranai",
+      "english": "who knows",
+      "list": "wantToLearn",
+      "order": 78,
+      "lastModified": 1,
+      "deleted": false
+    },
+    {
+      "id": "seed-want-080",
+      "romaji": "anata o yurusu",
+      "english": "I forgive you",
+      "list": "wantToLearn",
+      "order": 79,
+      "lastModified": 1,
+      "deleted": false
+    },
+    {
+      "id": "seed-want-081",
+      "romaji": "douritsu Xi",
+      "english": "its a tie for X place",
+      "list": "wantToLearn",
+      "order": 80,
+      "lastModified": 1,
+      "deleted": false
+    },
+    {
+      "id": "seed-want-082",
+      "romaji": "NHK Taigo Drama",
+      "english": "famous 1970s drama",
+      "list": "wantToLearn",
+      "order": 81,
+      "lastModified": 1,
+      "deleted": false
+    }
+  ]
+}
