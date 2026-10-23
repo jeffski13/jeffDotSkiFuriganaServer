@@ -34,6 +34,10 @@ export const ambiguousKanji: Record<string, AmbiguousReading[]> = {
     { readingOutput: '傍（そば）', count: 1, note: '理由 - ゆず' },
     { readingOutput: '傍（はた）', count: 0 },
   ],
+  身体: [
+    { readingOutput: '身体（からだ）', count: 1, note: '波乗りジョニー' },
+    { readingOutput: '身体（しんたい）', count: 0 },
+  ],
 };
 
 /**
