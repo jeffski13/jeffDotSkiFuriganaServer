@@ -38,12 +38,50 @@ interface KuroshiroInstance {
   init(analyzer: unknown): Promise<void>;
 }
 
+export interface AnalyzerToken {
+  surface_form: string;
+  reading?: string;
+  pronunciation?: string;
+  [key: string]: unknown;
+}
+
+interface Analyzer {
+  init(): Promise<void>;
+  parse(text: string): Promise<AnalyzerToken[]>;
+}
+
+// Kuroshiro treats any character in U+3040–U+30FF as kana, including symbols like '・', 'ー',
+// 'ヽ' and 'ゝ'. Same range as kuroshiro's own isHiragana/isKatakana.
+const isKanaRange = (ch: string): boolean => ch >= '぀' && ch <= 'ヿ';
+
+/**
+ * Kuroshiro reads all-kana tokens character by character, pairing surface_form[i] with
+ * reading[i], so it throws "str is not iterable" when the reading is shorter than the
+ * surface. kuromoji produces such readings for some dictionary entries, e.g. カントリー・ロード
+ * is read as カントリーロード (the '・' is dropped). Kana needs no furigana anyway, so for those
+ * tokens use the surface form itself as the reading.
+ */
+export const fixKanaTokenReadings = (tokens: AnalyzerToken[]): AnalyzerToken[] =>
+  tokens.map((token) => {
+    const surface = token.surface_form;
+    const isAllKana = surface.length > 0 && [...surface].every(isKanaRange);
+    if (!isAllKana || token.reading?.length === surface.length) {
+      return token;
+    }
+    return { ...token, reading: surface, pronunciation: surface };
+  });
+
+const withFixedKanaReadings = (analyzer: Analyzer): Analyzer => ({
+  init: () => analyzer.init(),
+  parse: async (text) => fixKanaTokenReadings(await analyzer.parse(text)),
+});
+
 let initPromise: Promise<KuroshiroInstance> | null = null;
 
 const getKuroshiro = (): Promise<KuroshiroInstance> => {
   if (!initPromise) {
     const instance: KuroshiroInstance = new Kuroshiro();
-    initPromise = instance.init(new KuromojiAnalyzer()).then(() => instance);
+    initPromise = instance.init(withFixedKanaReadings(new KuromojiAnalyzer())).then(() => instance);
   }
   return initPromise;
 };
