@@ -125,8 +125,15 @@ app.post('/lyricsQR', async (req: Request, res: Response) => {
   }
 });
 
+// Words To Learn is served from its own subdomain as well as the main site.
+export const WORDS_TO_LEARN_ALLOWED_ORIGINS = ['https://jeff.ski', 'https://words.jeff.ski'];
+
 app.use('/wordsToLearn', (req: Request, res: Response, next: NextFunction) => {
-  res.header('Access-Control-Allow-Origin', 'https://jeff.ski');
+  // Access-Control-Allow-Origin holds a single origin, so echo back the caller's when it's allowed.
+  const origin = req.headers.origin;
+  const allowedOrigin = origin && WORDS_TO_LEARN_ALLOWED_ORIGINS.includes(origin) ? origin : WORDS_TO_LEARN_ALLOWED_ORIGINS[0];
+  res.header('Access-Control-Allow-Origin', allowedOrigin);
+  res.header('Vary', 'Origin');
   res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   res.header('Access-Control-Allow-Headers', 'Content-Type');
 
