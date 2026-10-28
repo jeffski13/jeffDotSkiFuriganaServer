@@ -144,3 +144,28 @@ test('OPTIONS /wordsToLearn responds to the CORS preflight', async () => {
     assert.equal(response.headers.get('access-control-allow-methods'), 'GET, POST, OPTIONS');
   });
 });
+
+test('OPTIONS /wordsToLearn allows the jeff.ski origin', async () => {
+  await withServer(async (baseUrl) => {
+    const response = await fetch(`${baseUrl}/wordsToLearn`, { method: 'OPTIONS', headers: { Origin: 'https://jeff.ski' } });
+
+    assert.equal(response.headers.get('access-control-allow-origin'), 'https://jeff.ski');
+    assert.equal(response.headers.get('vary'), 'Origin');
+  });
+});
+
+test('OPTIONS /wordsToLearn allows the words.jeff.ski origin', async () => {
+  await withServer(async (baseUrl) => {
+    const response = await fetch(`${baseUrl}/wordsToLearn`, { method: 'OPTIONS', headers: { Origin: 'https://words.jeff.ski' } });
+
+    assert.equal(response.headers.get('access-control-allow-origin'), 'https://words.jeff.ski');
+  });
+});
+
+test('GET /wordsToLearn does not allow an unknown origin', async () => {
+  await withServer(async (baseUrl) => {
+    const response = await fetch(`${baseUrl}/wordsToLearn`, { headers: { Origin: 'https://evil.example.com' } });
+
+    assert.equal(response.headers.get('access-control-allow-origin'), 'https://jeff.ski');
+  });
+});
