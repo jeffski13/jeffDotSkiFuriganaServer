@@ -168,6 +168,7 @@ app.post('/wordsToLearn', async (req: Request, res: Response) => {
 
   try {
     if (!(await isValidWordsToLearnUpdateKey(updateKey))) {
+      console.error('Update key is invalid. Returning 403...');
       res.sendStatus(403);
       return;
     }

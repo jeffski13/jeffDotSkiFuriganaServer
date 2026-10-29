@@ -37,12 +37,22 @@ export const getWords = async (): Promise<Word[]> => {
 
 export const isValidUpdateKey = async (updateKey: string): Promise<boolean> => {
   if (!isFirebaseEnabled()) {
+    console.error('Local Update key did not match supplied key.');
     return isValidLocalUpdateKey(updateKey);
   }
 
   const snapshot = await getCollection().doc(CONFIG_DOCUMENT_ID).get();
   const expectedUpdateKey = snapshot.data()?.updateKey;
-  return typeof expectedUpdateKey === 'string' && expectedUpdateKey === updateKey;
+  if (typeof expectedUpdateKey !== 'string') {
+    console.error('Update key typecheck failure.');
+    return false;
+  }
+  if (expectedUpdateKey !== updateKey) {
+    console.error('Update key does not match expected value.');
+    return false;
+  }
+  return true;
+  ;
 };
 
 // Writes each incoming word unless the stored copy is newer, then returns the full list.
