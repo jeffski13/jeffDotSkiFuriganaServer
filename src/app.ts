@@ -95,8 +95,8 @@ app.use('/lyricsQR', (req: Request, res: Response, next: NextFunction) => {
 
 app.get('/lyricsQR', async (_req: Request, res: Response) => {
   try {
-    const { url, version } = await getRedirectConfig();
-    res.json({ url: url ?? null, version });
+    const { url, version, updatedAt } = await getRedirectConfig();
+    res.json({ url: url ?? null, version, updatedAt });
   } catch (error) {
     console.error('Failed to fetch lyrics QR redirect URL:', error);
     res.status(500).json({ error: 'Failed to fetch redirect URL.' });

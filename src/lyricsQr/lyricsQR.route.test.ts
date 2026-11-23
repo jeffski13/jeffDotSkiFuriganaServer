@@ -6,15 +6,17 @@ const state = {
   url: 'https://example.com/original',
   updateKey: 'correct-key',
   version: 3,
+  updatedAt: null as string | null,
 };
 
 mock.module('./lyricsQR.ts', {
   namedExports: {
-    getRedirectConfig: async () => ({ url: state.url, version: state.version }),
+    getRedirectConfig: async () => ({ url: state.url, version: state.version, updatedAt: state.updatedAt }),
     isValidUpdateKey: async (key: string) => key === state.updateKey,
     setRedirectUrl: async (url: string) => {
       state.url = url;
       state.version += 1;
+      state.updatedAt = '2026-11-23T14:05:00.000Z';
     },
   },
 });
@@ -39,6 +41,7 @@ test('GET /lyricsQR returns the current redirect url and version', async () => {
     const body = await response.json();
     assert.equal(body.url, 'https://example.com/original');
     assert.equal(body.version, 3);
+    assert.equal(body.updatedAt, null);
   });
 });
 
@@ -84,5 +87,6 @@ test('POST /lyricsQR updates the redirect url and increments the version when th
     const body = await getResponse.json();
     assert.equal(body.url, 'https://example.com/new');
     assert.equal(body.version, 4);
+    assert.equal(body.updatedAt, '2026-11-23T14:05:00.000Z');
   });
 });

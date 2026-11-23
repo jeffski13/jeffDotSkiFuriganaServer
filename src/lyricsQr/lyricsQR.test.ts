@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { getCollectionName, isFirebaseEnabled } from './lyricsQR.ts';
+import { getCollectionName, isFirebaseEnabled, toIsoString } from './lyricsQR.ts';
 
 test('getCollectionName returns the dev-prefixed collection when NODE_ENV is not production', () => {
   const original = process.env.NODE_ENV;
@@ -43,4 +43,15 @@ test('isFirebaseEnabled returns false only when USE_FIREBASE is explicitly "fals
       process.env.USE_FIREBASE = original;
     }
   }
+});
+
+test('toIsoString converts a Firestore Timestamp-like value to an ISO string', () => {
+  const timestamp = { toDate: () => new Date('2026-11-23T14:05:00.000Z') };
+  assert.equal(toIsoString(timestamp), '2026-11-23T14:05:00.000Z');
+});
+
+test('toIsoString returns null when the value is missing or not a Timestamp', () => {
+  assert.equal(toIsoString(undefined), null);
+  assert.equal(toIsoString(null), null);
+  assert.equal(toIsoString('2026-11-23T14:05:00.000Z'), null);
 });
