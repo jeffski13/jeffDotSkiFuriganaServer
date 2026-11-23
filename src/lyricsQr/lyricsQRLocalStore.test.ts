@@ -55,7 +55,11 @@ test('setLocalRedirectUrl persists the new url without changing the updateKey', 
 
 test('getLocalRedirectConfig seeds the file with the default version', async () => {
   await withTempFile((filePath) => {
-    assert.deepEqual(getLocalRedirectConfig(filePath), { url: DEFAULT_REDIRECT_URL, version: DEFAULT_VERSION });
+    assert.deepEqual(getLocalRedirectConfig(filePath), {
+      url: DEFAULT_REDIRECT_URL,
+      version: DEFAULT_VERSION,
+      updatedAt: null,
+    });
   });
 });
 
@@ -64,10 +68,12 @@ test('setLocalRedirectUrl increments the version on each update', async () => {
     setLocalRedirectUrl('https://example.com/first', filePath);
     assert.equal(getLocalRedirectConfig(filePath).version, DEFAULT_VERSION + 1);
 
-    setLocalRedirectUrl('https://example.com/second', filePath);
+    const now = new Date('2026-11-23T14:05:00.000Z');
+    setLocalRedirectUrl('https://example.com/second', filePath, now);
     assert.deepEqual(getLocalRedirectConfig(filePath), {
       url: 'https://example.com/second',
       version: DEFAULT_VERSION + 2,
+      updatedAt: '2026-11-23T14:05:00.000Z',
     });
   });
 });

@@ -22,7 +22,14 @@ const getDb = () => {
 
 const getConfigDoc = () => getDb().collection(getCollectionName()).doc(DOCUMENT_ID);
 
-export type RedirectConfig = { url: string | undefined; version: number };
+// updatedAt is an ISO-8601 string of when the url was last set, or null if it never has been.
+export type RedirectConfig = { url: string | undefined; version: number; updatedAt: string | null };
+
+// Firestore returns its Timestamp type for serverTimestamp() fields; anything else means "unknown".
+export const toIsoString = (value: unknown): string | null =>
+  value && typeof (value as { toDate?: unknown }).toDate === 'function'
+    ? (value as { toDate: () => Date }).toDate().toISOString()
+    : null;
 
 export const getRedirectConfig = async (): Promise<RedirectConfig> => {
   if (!isFirebaseEnabled()) {
@@ -31,7 +38,11 @@ export const getRedirectConfig = async (): Promise<RedirectConfig> => {
 
   const snapshot = await getConfigDoc().get();
   const data = snapshot.data();
-  return { url: data?.url, version: typeof data?.version === 'number' ? data.version : 0 };
+  return {
+    url: data?.url,
+    version: typeof data?.version === 'number' ? data.version : 0,
+    updatedAt: toIsoString(data?.updatedAt),
+  };
 };
 
 export const isValidUpdateKey = async (updateKey: string): Promise<boolean> => {
@@ -50,5 +61,5 @@ export const setRedirectUrl = async (url: string): Promise<void> => {
     return;
   }
 
-  await getConfigDoc().set({ url, version: FieldValue.increment(1) }, { merge: true });
+  await getConfigDoc().set({ url, version: FieldValue.increment(1), updatedAt: FieldValue.serverTimestamp() }, { merge: true });
 };
